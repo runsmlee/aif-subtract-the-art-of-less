@@ -21,7 +21,27 @@ describe('Principles', () => {
 
   it('renders principle descriptions', () => {
     render(<Principles />);
-    const descriptions = screen.getAllByText(/Subtraction is the undervalued|Strip away|don.t limit creativity|silence defines melody/);
+    const descriptions = screen.getAllByText(
+      /Subtraction is the undervalued|Strip away|don.t limit creativity|silence defines melody/,
+    );
     expect(descriptions).toHaveLength(4);
+  });
+
+  it('renders each principle with accessible labeled heading', () => {
+    render(<Principles />);
+    const removeTitle = document.getElementById('principle-title-remove');
+    const essentialTitle = document.getElementById('principle-title-essential');
+    const clarityTitle = document.getElementById('principle-title-clarity');
+    const spaceTitle = document.getElementById('principle-title-space');
+
+    expect(removeTitle).toBeInTheDocument();
+    expect(essentialTitle).toBeInTheDocument();
+    expect(clarityTitle).toBeInTheDocument();
+    expect(spaceTitle).toBeInTheDocument();
+  });
+
+  it('renders the philosophy label', () => {
+    render(<Principles />);
+    expect(screen.getByText('Philosophy')).toBeInTheDocument();
   });
 });

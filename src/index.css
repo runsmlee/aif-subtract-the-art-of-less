@@ -5,10 +5,25 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
   }
 
   body {
-    @apply font-system text-gray-900 bg-white;
+    @apply font-system text-gray-900 bg-white dark:text-gray-100 dark:bg-gray-950 transition-colors duration-300;
+  }
+
+  /* Skip to content link */
+  .skip-link {
+    @apply absolute -top-full left-4 z-[100] bg-brand-500 text-white px-4 py-2 rounded-b-lg text-sm font-medium transition-all duration-200;
+  }
+  .skip-link:focus {
+    @apply top-0;
+  }
+
+  /* Scroll progress bar */
+  .scroll-progress {
+    @apply fixed top-0 left-0 h-0.5 bg-brand-500 z-[60] transition-none;
+    transform-origin: left;
   }
 }
 

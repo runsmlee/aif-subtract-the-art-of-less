@@ -3,6 +3,24 @@ import '@testing-library/jest-dom';
 // Ensure React uses development build which exports `act`
 process.env.NODE_ENV = 'development';
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+})();
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
 // Mock IntersectionObserver for jsdom
 class MockIntersectionObserver {
   private callback: IntersectionObserverCallback;

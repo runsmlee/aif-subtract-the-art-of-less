@@ -53,7 +53,7 @@ function PrincipleCard({
   return (
     <article
       ref={ref}
-      className={`group p-6 sm:p-8 rounded-2xl border border-gray-100 bg-white hover:border-brand-200 hover:shadow-sm transition-all duration-300 ${
+      className={`group p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-sm dark:hover:shadow-none transition-all duration-300 ${
         shouldAnimate
           ? 'opacity-100 translate-y-0'
           : 'opacity-0 translate-y-6'
@@ -62,18 +62,18 @@ function PrincipleCard({
       aria-labelledby={`principle-title-${principle.id}`}
     >
       <div
-        className="w-12 h-12 flex items-center justify-center rounded-xl bg-brand-50 text-brand-500 text-xl font-bold mb-5 group-hover:bg-brand-100 transition-colors duration-200"
+        className="w-12 h-12 flex items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-500 text-xl font-bold mb-5 group-hover:bg-brand-100 dark:group-hover:bg-brand-900 transition-colors duration-200"
         aria-hidden="true"
       >
         {principle.icon}
       </div>
       <h3
         id={`principle-title-${principle.id}`}
-        className="text-lg font-semibold text-gray-900 mb-3"
+        className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3"
       >
         {principle.title}
       </h3>
-      <p className="text-gray-600 leading-relaxed">{principle.description}</p>
+      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{principle.description}</p>
     </article>
   );
 }
@@ -82,7 +82,7 @@ export function Principles() {
   return (
     <section
       id="principles"
-      className="py-20 sm:py-28 bg-gray-50/50"
+      className="py-20 sm:py-28 bg-gray-50/50 dark:bg-gray-900/50"
       aria-labelledby="principles-heading"
     >
       <div className="section-container">
@@ -92,11 +92,11 @@ export function Principles() {
           </p>
           <h2
             id="principles-heading"
-            className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
+            className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4"
           >
             Four principles of less
           </h2>
-          <p className="max-w-lg mx-auto text-gray-600">
+          <p className="max-w-lg mx-auto text-gray-600 dark:text-gray-400">
             Not a rigid framework — a way of seeing. These principles guide
             every decision toward simplicity.
           </p>
