@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -28,20 +28,22 @@ const quotes = [
 export function Quote() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const { ref, isInView } = useInView({ threshold: 0.15 });
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = !prefersReducedMotion && isInView;
+  const touchStartRef = useRef<number>(0);
 
-  // Auto-advance every 6 seconds
+  // Auto-advance every 6 seconds (paused when hovered)
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || isPaused) return;
 
     const timer = setInterval(() => {
       goToNext();
     }, 6000);
 
     return () => clearInterval(timer);
-  }, [isInView, currentIndex]);
+  }, [isInView, isPaused, currentIndex]);
 
   const goToQuote = useCallback((index: number) => {
     if (isTransitioning) return;
@@ -62,10 +64,25 @@ export function Quote() {
 
   const currentQuote = quotes[currentIndex];
 
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const diff = touchStartRef.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrev();
+      }
+    }
+  }, [goToNext, goToPrev]);
+
   return (
     <section
       ref={ref}
-      className="py-20 sm:py-28 bg-gray-50/50 dark:bg-gray-900/50"
+      className="py-20 sm:py-28 bg-white dark:bg-gray-950"
       aria-label="Inspiring quotes about simplicity"
     >
       <div className="section-container">
@@ -93,14 +110,18 @@ export function Quote() {
         >
           {/* Quote display */}
           <div
-            className="relative min-h-[200px] sm:min-h-[180px] flex items-center justify-center"
+            className="relative min-h-[200px] sm:min-h-[180px] flex items-center justify-center cursor-grab active:cursor-grabbing"
             role="region"
             aria-roledescription="carousel"
             aria-label="Quote carousel"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
             <blockquote
               key={currentIndex}
-              className={`text-center absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${
+              className={`text-center absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 px-4 ${
                 isTransitioning
                   ? 'opacity-0 translate-y-2'
                   : 'opacity-100 translate-y-0'
@@ -161,6 +182,13 @@ export function Quote() {
               </svg>
             </button>
           </div>
+
+          {/* Pause indicator */}
+          {isPaused && (
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3" aria-live="polite">
+              Paused — move cursor away to resume
+            </p>
+          )}
         </div>
       </div>
     </section>

@@ -173,4 +173,22 @@ describe('SubtractionExercise', () => {
 
     expect(progressbar).toHaveAttribute('aria-valuenow', '13');
   });
+
+  it('shows toast notification when item is subtracted', () => {
+    render(<SubtractionExercise />);
+    const subtractButtons = screen.getAllByRole('button', {
+      name: /^Subtract/,
+    });
+    fireEvent.click(subtractButtons[0]);
+
+    // Toast should appear with the item label
+    const toast = screen.getByText(/Subtracted: Unnecessary meetings/);
+    expect(toast).toBeInTheDocument();
+  });
+
+  it('renders keyboard shortcut tip', () => {
+    render(<SubtractionExercise />);
+    const tip = screen.getByText(/Press 1-9 to subtract by keyboard/);
+    expect(tip).toBeInTheDocument();
+  });
 });

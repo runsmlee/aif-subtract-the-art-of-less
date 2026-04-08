@@ -1,6 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+
+function AnimatedCounter({ target, duration = 1500, shouldStart }: { target: number; duration?: number; shouldStart: boolean }) {
+  const [count, setCount] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
+  const frameRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (!shouldStart || prefersReducedMotion) {
+      if (shouldStart) setCount(target);
+      return;
+    }
+
+    const startTime = performance.now();
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [shouldStart, target, duration, prefersReducedMotion]);
+
+  return <span>{count}</span>;
+}
+
+interface FloatingShape {
+  id: number;
+  cx: number;
+  cy: number;
+  r: number;
+  type: 'circle' | 'rect' | 'triangle';
+  rotation: number;
+}
+
+const floatingShapes: FloatingShape[] = [
+  { id: 1, cx: 40, cy: 60, r: 15, type: 'circle', rotation: 0 },
+  { id: 2, cx: 155, cy: 45, r: 12, type: 'rect', rotation: 15 },
+  { id: 3, cx: 30, cy: 145, r: 10, type: 'circle', rotation: 0 },
+  { id: 4, cx: 165, cy: 155, r: 10, type: 'circle', rotation: 0 },
+  { id: 5, cx: 50, cy: 125, r: 8, type: 'triangle', rotation: 0 },
+  { id: 6, cx: 140, cy: 135, r: 9, type: 'rect', rotation: -10 },
+  { id: 7, cx: 75, cy: 40, r: 7, type: 'triangle', rotation: 30 },
+  { id: 8, cx: 130, cy: 70, r: 6, type: 'circle', rotation: 0 },
+];
 
 function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
   const [step, setStep] = useState(0);
@@ -9,11 +58,23 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
     if (!shouldAnimate) return;
 
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const delays = [800, 1600, 2400, 3200];
+    const delays = [600, 1200, 1800, 2400, 3000, 3600, 4200, 4800];
 
-    delays.forEach((delay, index) => {
-      timers.push(setTimeout(() => setStep(index + 1), delay));
+    // Shapes disappear in waves
+    const waveSizes = [2, 2, 2, 2];
+    let delayIndex = 0;
+
+    waveSizes.forEach((waveSize, waveIndex) => {
+      for (let i = 0; i < waveSize && delayIndex < delays.length; i++) {
+        timers.push(
+          setTimeout(() => setStep(waveIndex + 1), delays[delayIndex])
+        );
+        delayIndex++;
+      }
     });
+
+    // Final reveal
+    timers.push(setTimeout(() => setStep(5), 5400));
 
     return () => {
       timers.forEach((t) => clearTimeout(t));
@@ -23,61 +84,96 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
   return (
     <div className="relative w-full max-w-xs mx-auto mb-12" aria-hidden="true">
       <svg viewBox="0 0 200 200" className="w-full h-auto">
-        {/* Background clutter - shapes that fade out progressively */}
-        <circle
-          cx="40" cy="60" r="15"
-          fill="none" stroke="currentColor" strokeWidth="1.5"
-          className="text-gray-300 dark:text-gray-700 transition-all duration-700"
-          opacity={step < 1 ? 0.6 : 0}
-        />
-        <rect
-          x="140" y="40" width="20" height="20" rx="3"
-          fill="none" stroke="currentColor" strokeWidth="1.5"
-          className="text-gray-300 dark:text-gray-700 transition-all duration-700"
-          opacity={step < 1 ? 0.6 : 0}
-          transform="rotate(15 150 50)"
-        />
-        <line
-          x1="30" y1="140" x2="70" y2="160"
-          stroke="currentColor" strokeWidth="1.5"
-          className="text-gray-300 dark:text-gray-700 transition-all duration-700"
-          opacity={step < 2 ? 0.5 : 0}
-        />
-        <circle
-          cx="160" cy="150" r="10"
-          fill="none" stroke="currentColor" strokeWidth="1.5"
-          className="text-gray-300 dark:text-gray-700 transition-all duration-700"
-          opacity={step < 2 ? 0.5 : 0}
-        />
-        <polygon
-          points="45,120 55,140 35,140"
-          fill="none" stroke="currentColor" strokeWidth="1.5"
-          className="text-gray-300 dark:text-gray-700 transition-all duration-700"
-          opacity={step < 3 ? 0.4 : 0}
-        />
-        <rect
-          x="130" y="130" width="15" height="15" rx="2"
-          fill="none" stroke="currentColor" strokeWidth="1.5"
-          className="text-gray-300 dark:text-gray-700 transition-all duration-700"
-          opacity={step < 3 ? 0.4 : 0}
-          transform="rotate(-10 137 137)"
-        />
+        {/* Floating shapes that fade out in waves */}
+        {floatingShapes.map((shape, index) => {
+          const wave = Math.floor(index / 2) + 1;
+          const opacity = step < wave ? 0.6 - wave * 0.05 : 0;
+          const scale = step < wave ? 1 : 1.3;
+          const className = `text-gray-300 dark:text-gray-700 transition-all duration-700`;
 
-        {/* Core element - the brand circle that remains */}
+          if (shape.type === 'circle') {
+            return (
+              <circle
+                key={shape.id}
+                cx={shape.cx}
+                cy={shape.cy}
+                r={shape.r * scale}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                className={className}
+                opacity={opacity}
+              />
+            );
+          }
+
+          if (shape.type === 'rect') {
+            return (
+              <rect
+                key={shape.id}
+                x={shape.cx - shape.r}
+                y={shape.cy - shape.r}
+                width={shape.r * 2}
+                height={shape.r * 2}
+                rx="2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                className={className}
+                opacity={opacity}
+                transform={`rotate(${shape.rotation} ${shape.cx} ${shape.cy})`}
+              />
+            );
+          }
+
+          // triangle
+          const s = shape.r;
+          const points = `${shape.cx},${shape.cy - s} ${shape.cx + s},${shape.cy + s} ${shape.cx - s},${shape.cy + s}`;
+          return (
+            <polygon
+              key={shape.id}
+              points={points}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className={className}
+              opacity={opacity}
+            />
+          );
+        })}
+
+        {/* Core element — the brand circle that grows */}
         <circle
-          cx="100" cy="100"
-          r={step >= 4 ? 35 : 20}
-          fill="none" stroke="#EF4444" strokeWidth="2"
+          cx="100"
+          cy="100"
+          r={step >= 5 ? 35 : 20}
+          fill="none"
+          stroke="#EF4444"
+          strokeWidth="2"
           className="transition-all duration-1000"
-          opacity={step >= 4 ? 1 : 0.3}
+          opacity={step >= 5 ? 1 : 0.25}
         />
 
-        {/* Center dot - the essential */}
+        {/* Inner glow ring */}
         <circle
-          cx="100" cy="100" r="4"
+          cx="100"
+          cy="100"
+          r={step >= 5 ? 28 : 12}
+          fill="none"
+          stroke="#EF4444"
+          strokeWidth="0.5"
+          className="transition-all duration-1000 delay-200"
+          opacity={step >= 5 ? 0.4 : 0}
+        />
+
+        {/* Center dot — the essential */}
+        <circle
+          cx="100"
+          cy="100"
+          r="4"
           fill="#EF4444"
-          className="transition-all duration-1000"
-          opacity={step >= 4 ? 1 : 0}
+          className="transition-all duration-1000 delay-300"
+          opacity={step >= 5 ? 1 : 0}
         />
       </svg>
     </div>
@@ -95,7 +191,7 @@ export function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
       aria-label="Hero"
     >
-      {/* Subtle background pattern */}
+      {/* Subtle dot grid pattern */}
       <div
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
         style={{
@@ -106,7 +202,13 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <div className="section-container text-center py-20 sm:py-28">
+      {/* Gradient accent */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/5 dark:bg-brand-500/10 rounded-full blur-3xl"
+        aria-hidden="true"
+      />
+
+      <div className="section-container text-center py-20 sm:py-28 relative z-10">
         {/* Visual subtraction animation */}
         <div
           className={`transition-all duration-1000 ${
@@ -170,9 +272,37 @@ export function Hero() {
           </a>
         </div>
 
+        {/* Impact numbers */}
+        <div
+          className={`mt-16 grid grid-cols-3 gap-8 max-w-md mx-auto transition-all duration-700 delay-500 ${
+            shouldAnimate
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
+          <div className="text-center">
+            <p className="text-2xl sm:text-3xl font-bold text-brand-500">
+              <AnimatedCounter target={8} shouldStart={shouldAnimate} />
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">things to let go</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl sm:text-3xl font-bold text-brand-500">
+              <AnimatedCounter target={4} shouldStart={shouldAnimate} />
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">core principles</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl sm:text-3xl font-bold text-brand-500">
+              ∞
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">potential unlocked</p>
+          </div>
+        </div>
+
         {/* Scroll indicator */}
         <div
-          className={`mt-12 transition-all duration-700 delay-500 ${
+          className={`mt-12 transition-all duration-700 delay-700 ${
             shouldAnimate ? 'opacity-100' : 'opacity-0'
           }`}
           aria-hidden="true"

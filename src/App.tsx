@@ -1,6 +1,7 @@
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Principles } from './components/Principles';
+import { BeforeAfter } from './components/BeforeAfter';
 import { SubtractionExercise } from './components/SubtractionExercise';
 import { Quote } from './components/Quote';
 import { Reflection } from './components/Reflection';
@@ -18,6 +19,7 @@ export function App() {
       <main id="main-content" className="flex-1">
         <Hero />
         <Principles />
+        <BeforeAfter />
         <SubtractionExercise />
         <Quote />
         <Reflection />

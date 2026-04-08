@@ -37,6 +37,14 @@ describe('App', () => {
     expect(principlesHeading).toBeInTheDocument();
   });
 
+  it('renders the before/after section', () => {
+    renderWithTheme(<App />);
+    const beforeAfterHeading = screen.getByRole('heading', {
+      name: /Before subtraction, after clarity/i,
+    });
+    expect(beforeAfterHeading).toBeInTheDocument();
+  });
+
   it('renders the practice section', () => {
     renderWithTheme(<App />);
     const practiceHeading = screen.getByRole('heading', {

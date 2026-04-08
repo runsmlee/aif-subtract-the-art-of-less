@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -92,10 +92,23 @@ function CompletionCelebration({ onReset, onReflect }: { onReset: () => void; on
   );
 }
 
+function RemovedToast({ label }: { label: string }) {
+  return (
+    <div
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-5 py-3 rounded-xl shadow-lg text-sm font-medium animate-slide-up pointer-events-none"
+      role="status"
+      aria-live="polite"
+    >
+      − Subtracted: {label}
+    </div>
+  );
+}
+
 export function SubtractionExercise() {
   const [items, setItems] = useState<ClutterItem[]>(initialItems);
   const [customInput, setCustomInput] = useState('');
   const [customIdCounter, setCustomIdCounter] = useState(0);
+  const [toast, setToast] = useState<string | null>(null);
   const { ref, isInView } = useInView({ threshold: 0.1 });
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = !prefersReducedMotion && isInView;
@@ -104,13 +117,19 @@ export function SubtractionExercise() {
   const remainingCount = items.filter((item) => !item.removed).length;
   const totalCount = items.length;
 
-  const handleRemove = useCallback((id: string) => {
+  const showToast = useCallback((label: string) => {
+    setToast(label);
+    setTimeout(() => setToast(null), 1500);
+  }, []);
+
+  const handleRemove = useCallback((id: string, label: string) => {
     setItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, removed: true } : item,
       ),
     );
-  }, []);
+    showToast(label);
+  }, [showToast]);
 
   const handleRestore = useCallback((id: string) => {
     setItems((prev) =>
@@ -159,11 +178,29 @@ export function SubtractionExercise() {
 
   const isComplete = remainingCount === 0 && totalCount > 0;
 
+  // Keyboard shortcut: number keys to remove items
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      const num = parseInt(e.key, 10);
+      if (num >= 1 && num <= 9) {
+        const remainingItems = items.filter((item) => !item.removed);
+        if (num <= remainingItems.length) {
+          const targetItem = remainingItems[num - 1];
+          handleRemove(targetItem.id, targetItem.label);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [items, handleRemove]);
+
   return (
     <section
       id="practice"
       ref={ref}
-      className="py-20 sm:py-28"
+      className="py-20 sm:py-28 bg-gray-50/50 dark:bg-gray-900/50"
       aria-labelledby="practice-heading"
     >
       <div className="section-container">
@@ -180,6 +217,9 @@ export function SubtractionExercise() {
           <p className="max-w-lg mx-auto text-gray-600 dark:text-gray-400">
             Click to subtract each item. Watch how lighter things feel when you
             let go.
+          </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+            Tip: Press 1-9 to subtract by keyboard
           </p>
         </div>
 
@@ -262,7 +302,7 @@ export function SubtractionExercise() {
                     onClick={() =>
                       item.removed
                         ? handleRestore(item.id)
-                        : handleRemove(item.id)
+                        : handleRemove(item.id, item.label)
                     }
                     className={`inline-flex items-center justify-center w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
                       item.removed
@@ -341,6 +381,9 @@ export function SubtractionExercise() {
           )}
         </div>
       </div>
+
+      {/* Toast notification */}
+      {toast && <RemovedToast label={toast} />}
     </section>
   );
 }
