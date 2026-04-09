@@ -7,13 +7,15 @@ interface ComparisonItem {
   before: string;
   after: string;
   icon: string;
+  beforeCount: number;
+  afterCount: number;
 }
 
 const comparisons: ComparisonItem[] = [
-  { id: 'design', before: '10 decorative elements', after: '1 clear message', icon: '✦' },
-  { id: 'schedule', before: '12 meetings this week', after: '3 meaningful conversations', icon: '◎' },
-  { id: 'goals', before: '25 priorities for Q4', after: '3 outcomes that matter', icon: '◆' },
-  { id: 'inbox', before: '200 unread emails', after: '5 requiring action', icon: '○' },
+  { id: 'design', before: '10 decorative elements', after: '1 clear message', icon: '✦', beforeCount: 10, afterCount: 1 },
+  { id: 'schedule', before: '12 meetings this week', after: '3 meaningful conversations', icon: '◎', beforeCount: 12, afterCount: 3 },
+  { id: 'goals', before: '25 priorities for Q4', after: '3 outcomes that matter', icon: '◆', beforeCount: 25, afterCount: 3 },
+  { id: 'inbox', before: '200 unread emails', after: '5 requiring action', icon: '○', beforeCount: 200, afterCount: 5 },
 ];
 
 function ComparisonCard({
@@ -25,6 +27,8 @@ function ComparisonCard({
   isRevealed: boolean;
   onReveal: () => void;
 }) {
+  const reductionPercent = Math.round(((item.beforeCount - item.afterCount) / item.beforeCount) * 100);
+
   return (
     <button
       onClick={onReveal}
@@ -60,6 +64,20 @@ function ComparisonCard({
               Click to subtract →
             </p>
           )}
+          {isRevealed && (
+            <div className="mt-2 flex items-center gap-2">
+              <div
+                className="h-1 rounded-full bg-brand-200 dark:bg-brand-800 flex-1 overflow-hidden"
+                aria-hidden="true"
+              >
+                <div
+                  className="h-full bg-brand-500 rounded-full transition-all duration-1000"
+                  style={{ width: `${reductionPercent}%` }}
+                />
+              </div>
+              <span className="text-xs text-brand-500 font-medium">{reductionPercent}% less</span>
+            </div>
+          )}
         </div>
         {isRevealed && (
           <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-brand-500 text-white text-xs" aria-hidden="true">
@@ -78,6 +96,7 @@ export function BeforeAfter() {
   const shouldAnimate = !prefersReducedMotion && isInView;
 
   const allRevealed = revealedIds.size === comparisons.length;
+  const revealedCount = revealedIds.size;
 
   const handleReveal = useCallback((id: string) => {
     setRevealedIds((prev) => {
@@ -118,6 +137,25 @@ export function BeforeAfter() {
             <p className="max-w-lg mx-auto text-gray-600 dark:text-gray-400">
               Click each card to see what happens when you apply the art of less.
             </p>
+            {/* Progress indicator */}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <div className="flex items-center gap-1">
+                {comparisons.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      i < revealedCount
+                        ? 'bg-brand-500'
+                        : 'bg-gray-200 dark:bg-gray-700'
+                    }`}
+                    aria-hidden="true"
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">
+                {revealedCount}/{comparisons.length}
+              </span>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -143,8 +181,15 @@ export function BeforeAfter() {
           )}
 
           {allRevealed && (
-            <div className="mt-8 p-6 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-center">
-              <p className="text-gray-700 dark:text-gray-300 font-medium">
+            <div
+              className="mt-8 p-6 sm:p-8 bg-gradient-to-br from-brand-50 to-white dark:from-brand-950 dark:to-gray-900 rounded-2xl border border-brand-100 dark:border-brand-800 text-center"
+            >
+              <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-brand-100 dark:bg-brand-900 flex items-center justify-center" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </div>
+              <p className="text-gray-900 dark:text-gray-100 font-medium text-lg">
                 Every subtraction reveals something more valuable.
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">

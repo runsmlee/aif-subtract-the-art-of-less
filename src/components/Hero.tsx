@@ -67,7 +67,7 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
     waveSizes.forEach((waveSize, waveIndex) => {
       for (let i = 0; i < waveSize && delayIndex < delays.length; i++) {
         timers.push(
-          setTimeout(() => setStep(waveIndex + 1), delays[delayIndex])
+          setTimeout(() => setStep(waveIndex + 1), delays[delayIndex]),
         );
         delayIndex++;
       }
@@ -84,24 +84,40 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
   return (
     <div className="relative w-full max-w-xs mx-auto mb-12" aria-hidden="true">
       <svg viewBox="0 0 200 200" className="w-full h-auto">
+        {/* Outer pulse ring that appears during subtraction */}
+        <circle
+          cx="100"
+          cy="100"
+          r={step >= 1 && step < 5 ? 60 + step * 8 : 0}
+          fill="none"
+          stroke="#EF4444"
+          strokeWidth="0.5"
+          className="transition-all duration-1000"
+          opacity={step >= 1 && step < 5 ? 0.1 : 0}
+        />
+
         {/* Floating shapes that fade out in waves */}
         {floatingShapes.map((shape, index) => {
           const wave = Math.floor(index / 2) + 1;
           const opacity = step < wave ? 0.6 - wave * 0.05 : 0;
           const scale = step < wave ? 1 : 1.3;
-          const className = `text-gray-300 dark:text-gray-700 transition-all duration-700`;
+          const translateX = step >= wave ? (shape.cx - 100) * 0.3 : 0;
+          const translateY = step >= wave ? (shape.cy - 100) * 0.3 : 0;
+          const fillColor = step >= wave ? '#EF4444' : 'currentColor';
+          const fillOpacity = step >= wave ? 0 : 0;
 
           if (shape.type === 'circle') {
             return (
               <circle
                 key={shape.id}
-                cx={shape.cx}
-                cy={shape.cy}
+                cx={shape.cx + translateX}
+                cy={shape.cy + translateY}
                 r={shape.r * scale}
-                fill="none"
+                fill={fillColor}
+                fillOpacity={fillOpacity}
                 stroke="currentColor"
                 strokeWidth="1.5"
-                className={className}
+                className="text-gray-300 dark:text-gray-700 transition-all duration-700"
                 opacity={opacity}
               />
             );
@@ -111,15 +127,16 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
             return (
               <rect
                 key={shape.id}
-                x={shape.cx - shape.r}
-                y={shape.cy - shape.r}
-                width={shape.r * 2}
-                height={shape.r * 2}
+                x={shape.cx - shape.r + translateX}
+                y={shape.cy - shape.r + translateY}
+                width={shape.r * 2 * scale}
+                height={shape.r * 2 * scale}
                 rx="2"
-                fill="none"
+                fill={fillColor}
+                fillOpacity={fillOpacity}
                 stroke="currentColor"
                 strokeWidth="1.5"
-                className={className}
+                className="text-gray-300 dark:text-gray-700 transition-all duration-700"
                 opacity={opacity}
                 transform={`rotate(${shape.rotation} ${shape.cx} ${shape.cy})`}
               />
@@ -128,15 +145,16 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
 
           // triangle
           const s = shape.r;
-          const points = `${shape.cx},${shape.cy - s} ${shape.cx + s},${shape.cy + s} ${shape.cx - s},${shape.cy + s}`;
+          const points = `${shape.cx + translateX},${shape.cy - s + translateY} ${shape.cx + s + translateX},${shape.cy + s + translateY} ${shape.cx - s + translateX},${shape.cy + s + translateY}`;
           return (
             <polygon
               key={shape.id}
               points={points}
-              fill="none"
+              fill={fillColor}
+              fillOpacity={fillOpacity}
               stroke="currentColor"
               strokeWidth="1.5"
-              className={className}
+              className="text-gray-300 dark:text-gray-700 transition-all duration-700"
               opacity={opacity}
             />
           );
@@ -164,6 +182,19 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
           strokeWidth="0.5"
           className="transition-all duration-1000 delay-200"
           opacity={step >= 5 ? 0.4 : 0}
+        />
+
+        {/* Outer decorative ring */}
+        <circle
+          cx="100"
+          cy="100"
+          r={step >= 5 ? 42 : 15}
+          fill="none"
+          stroke="#EF4444"
+          strokeWidth="0.3"
+          className="transition-all duration-1000 delay-500"
+          opacity={step >= 5 ? 0.15 : 0}
+          strokeDasharray="4 6"
         />
 
         {/* Center dot — the essential */}
@@ -205,6 +236,14 @@ export function Hero() {
       {/* Gradient accent */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/5 dark:bg-brand-500/10 rounded-full blur-3xl"
+        aria-hidden="true"
+      />
+
+      {/* Animated brand accent line */}
+      <div
+        className={`absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-500/20 to-transparent transition-opacity duration-1000 ${
+          shouldAnimate ? 'opacity-100' : 'opacity-0'
+        }`}
         aria-hidden="true"
       />
 
@@ -260,9 +299,23 @@ export function Hero() {
         >
           <a
             href="#practice"
-            className="inline-flex items-center justify-center h-12 px-8 text-base font-medium text-white bg-brand-500 rounded-lg hover:bg-brand-600 dark:hover:bg-brand-400 active:bg-brand-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+            className="inline-flex items-center justify-center h-12 px-8 text-base font-medium text-white bg-brand-500 rounded-lg hover:bg-brand-600 dark:hover:bg-brand-400 active:bg-brand-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950 group"
           >
             Try the Exercise
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              className="ml-2 transition-transform duration-200 group-hover:translate-y-0.5"
+              aria-hidden="true"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <polyline points="19 12 12 19 5 12" />
+            </svg>
           </a>
           <a
             href="#principles"
@@ -310,6 +363,7 @@ export function Hero() {
           <div className="w-6 h-10 border-2 border-gray-300 dark:border-gray-600 rounded-full mx-auto flex justify-center">
             <div className="w-1 h-3 bg-gray-400 dark:bg-gray-500 rounded-full mt-2 animate-bounce" />
           </div>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">Scroll to explore</p>
         </div>
       </div>
     </section>

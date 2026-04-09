@@ -45,6 +45,14 @@ describe('App', () => {
     expect(beforeAfterHeading).toBeInTheDocument();
   });
 
+  it('renders the daily challenge section', () => {
+    renderWithTheme(<App />);
+    const challengeHeading = screen.getByRole('heading', {
+      name: /One small subtraction/i,
+    });
+    expect(challengeHeading).toBeInTheDocument();
+  });
+
   it('renders the practice section', () => {
     renderWithTheme(<App />);
     const practiceHeading = screen.getByRole('heading', {
@@ -100,5 +108,12 @@ describe('App', () => {
     // Verify the component renders without errors by checking app structure
     const main = screen.getByRole('main');
     expect(main).toBeInTheDocument();
+  });
+
+  it('renders the section divider', () => {
+    renderWithTheme(<App />);
+    const main = screen.getByRole('main');
+    const divider = main.querySelector('.section-divider');
+    expect(divider).toBeInTheDocument();
   });
 });
