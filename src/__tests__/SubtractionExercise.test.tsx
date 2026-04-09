@@ -84,6 +84,16 @@ describe('SubtractionExercise', () => {
     expect(screen.getByText('Potential unlocked')).toBeInTheDocument();
   });
 
+  it('shows share button in completion celebration', () => {
+    render(<SubtractionExercise />);
+    const subtractButtons = screen.getAllByRole('button', {
+      name: /^Subtract/,
+    });
+    subtractButtons.forEach((button) => fireEvent.click(button));
+
+    expect(screen.getByText('Share Score')).toBeInTheDocument();
+  });
+
   it('shows reset button after removing items', () => {
     render(<SubtractionExercise />);
     const subtractButtons = screen.getAllByRole('button', {

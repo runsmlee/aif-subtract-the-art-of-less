@@ -8,6 +8,7 @@ import { Quote } from './components/Quote';
 import { Reflection } from './components/Reflection';
 import { Footer } from './components/Footer';
 import { ScrollProgress } from './components/ScrollProgress';
+import { ScrollToTop } from './components/ScrollToTop';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 export function App() {
@@ -43,6 +44,7 @@ export function App() {
         </ErrorBoundary>
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 }

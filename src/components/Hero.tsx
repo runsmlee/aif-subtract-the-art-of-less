@@ -58,7 +58,7 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
     if (!shouldAnimate) return;
 
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const delays = [600, 1200, 1800, 2400, 3000, 3600, 4200, 4800];
+    const delays = [400, 800, 1200, 1600, 2000, 2400, 2800, 3200];
 
     // Shapes disappear in waves
     const waveSizes = [2, 2, 2, 2];
@@ -74,7 +74,7 @@ function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
     });
 
     // Final reveal
-    timers.push(setTimeout(() => setStep(5), 5400));
+    timers.push(setTimeout(() => setStep(5), 3800));
 
     return () => {
       timers.forEach((t) => clearTimeout(t));

@@ -1,5 +1,14 @@
+const footerTaglines = [
+  'Less is more.',
+  'Simplicity is the ultimate sophistication.',
+  'What remains when everything unnecessary is gone?',
+  'Subtract to reveal.',
+  'Clarity through reduction.',
+];
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const tagline = footerTaglines[Math.floor(Math.random() * footerTaglines.length)];
 
   return (
     <footer className="py-12 border-t border-gray-100 dark:border-gray-800" role="contentinfo">
@@ -15,6 +24,11 @@ export function Footer() {
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">The Art of Less</span>
           </div>
+
+          {/* Rotating tagline */}
+          <p className="text-sm text-gray-400 dark:text-gray-500 italic text-center max-w-xs">
+            {tagline}
+          </p>
 
           {/* Navigation */}
           <nav aria-label="Footer navigation">

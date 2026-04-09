@@ -21,10 +21,12 @@ const comparisons: ComparisonItem[] = [
 function ComparisonCard({
   item,
   isRevealed,
+  isAnimating,
   onReveal,
 }: {
   item: ComparisonItem;
   isRevealed: boolean;
+  isAnimating: boolean;
   onReveal: () => void;
 }) {
   const reductionPercent = Math.round(((item.beforeCount - item.afterCount) / item.beforeCount) * 100);
@@ -33,6 +35,10 @@ function ComparisonCard({
     <button
       onClick={onReveal}
       className={`group w-full text-left p-5 sm:p-6 rounded-2xl border transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950 ${
+        isAnimating
+          ? 'scale-[0.98]'
+          : ''
+      } ${
         isRevealed
           ? 'border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950/30'
           : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm cursor-pointer'
@@ -91,6 +97,7 @@ function ComparisonCard({
 
 export function BeforeAfter() {
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+  const [animatingId, setAnimatingId] = useState<string | null>(null);
   const { ref, isInView } = useInView({ threshold: 0.1 });
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = !prefersReducedMotion && isInView;
@@ -99,11 +106,13 @@ export function BeforeAfter() {
   const revealedCount = revealedIds.size;
 
   const handleReveal = useCallback((id: string) => {
+    setAnimatingId(id);
     setRevealedIds((prev) => {
       const next = new Set(prev);
       next.add(id);
       return next;
     });
+    setTimeout(() => setAnimatingId(null), 500);
   }, []);
 
   const handleRevealAll = useCallback(() => {
@@ -164,6 +173,7 @@ export function BeforeAfter() {
                 key={item.id}
                 item={item}
                 isRevealed={revealedIds.has(item.id)}
+                isAnimating={animatingId === item.id}
                 onReveal={() => handleReveal(item.id)}
               />
             ))}

@@ -20,7 +20,7 @@ const initialItems: ClutterItem[] = [
   { id: 'assumptions', label: 'Unchecked assumptions', removed: false },
 ];
 
-function CompletionCelebration({ onReset, onReflect }: { onReset: () => void; onReflect: () => void }) {
+function CompletionCelebration({ onReset, onReflect, onShare }: { onReset: () => void; onReflect: () => void; onShare: () => void }) {
   const { ref, isInView } = useInView({ threshold: 0.2 });
   const shouldAnimate = isInView;
 
@@ -81,8 +81,21 @@ function CompletionCelebration({ onReset, onReflect }: { onReset: () => void; on
             Reflect on What Remains
           </button>
           <button
-            onClick={onReset}
+            onClick={onShare}
             className="inline-flex items-center justify-center h-11 px-6 text-sm font-medium text-brand-600 dark:text-brand-400 bg-white dark:bg-gray-800 border border-brand-200 dark:border-brand-700 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="mr-2" aria-hidden="true">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            Share Score
+          </button>
+          <button
+            onClick={onReset}
+            className="inline-flex items-center justify-center h-11 px-6 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
           >
             Start Over
           </button>
@@ -178,6 +191,28 @@ export function SubtractionExercise() {
 
   const isComplete = remainingCount === 0 && totalCount > 0;
 
+  // Build a shareable summary
+  const getShareText = useCallback(() => {
+    const removed = items.filter((item) => item.removed);
+    const labels = removed.map((item) => item.label).join(', ');
+    return `I subtracted ${removedCount} things that don't matter: ${labels}. Try it yourself at Subtract — The Art of Less.`;
+  }, [items, removedCount]);
+
+  const handleShare = useCallback(async () => {
+    const text = getShareText();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'My Subtraction Score', text });
+      } catch {
+        // User cancelled or share failed — copy to clipboard as fallback
+        await navigator.clipboard.writeText(text);
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+    }
+    showToast('Score copied to clipboard');
+  }, [getShareText, showToast]);
+
   // Keyboard shortcut: number keys to remove items
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -245,11 +280,37 @@ export function SubtractionExercise() {
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">{progressPercent}%</span>
             </div>
-            <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-brand-500 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${progressPercent}%` }}
               />
+              {/* Milestone markers at 25%, 50%, 75% */}
+              {[25, 50, 75].map((milestone) => (
+                <div
+                  key={milestone}
+                  className="absolute top-0 h-full w-px bg-gray-300 dark:bg-gray-600"
+                  style={{ left: `${milestone}%` }}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+            {/* Milestone labels */}
+            <div className="relative mt-1.5 h-4">
+              {[25, 50, 75].map((milestone) => (
+                <span
+                  key={milestone}
+                  className={`absolute text-[10px] font-medium transition-colors duration-300 -translate-x-1/2 ${
+                    progressPercent >= milestone
+                      ? 'text-brand-500'
+                      : 'text-gray-300 dark:text-gray-600'
+                  }`}
+                  style={{ left: `${milestone}%` }}
+                  aria-hidden="true"
+                >
+                  {milestone}%
+                </span>
+              ))}
             </div>
           </div>
 
@@ -365,6 +426,7 @@ export function SubtractionExercise() {
               onReflect={() => {
                 document.getElementById('reflect')?.scrollIntoView({ behavior: 'smooth' });
               }}
+              onShare={handleShare}
             />
           )}
 

@@ -116,4 +116,12 @@ describe('App', () => {
     const divider = main.querySelector('.section-divider');
     expect(divider).toBeInTheDocument();
   });
+
+  it('renders without crashing with ScrollToTop', () => {
+    renderWithTheme(<App />);
+    // ScrollToTop is only visible when scrolled down, so it won't be in the DOM initially
+    // Just verify the app renders without errors
+    const main = screen.getByRole('main');
+    expect(main).toBeInTheDocument();
+  });
 });
