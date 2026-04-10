@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const SECTION_IDS = ['principles', 'practice', 'reflect'];
+const SECTION_IDS = ['principles', 'practice', 'journal', 'reflect'];
 
 export function useActiveSection(): string {
   const [activeSection, setActiveSection] = useState('');

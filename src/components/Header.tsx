@@ -167,6 +167,9 @@ export function Header() {
           <NavLink href="#practice" isActive={activeSection === 'practice'}>
             Practice
           </NavLink>
+          <NavLink href="#journal" isActive={activeSection === 'journal'}>
+            Journal
+          </NavLink>
           <NavLink href="#reflect" isActive={activeSection === 'reflect'}>
             Reflect
           </NavLink>
@@ -251,6 +254,18 @@ export function Header() {
             role="menuitem"
           >
             Practice
+          </a>
+          <a
+            href="#journal"
+            onClick={closeMobileMenu}
+            className={`block py-3 px-4 text-base rounded-lg transition-colors duration-200 ${
+              activeSection === 'journal'
+                ? 'text-brand-500 bg-brand-50 dark:bg-brand-950 dark:text-brand-400'
+                : 'text-gray-700 dark:text-gray-300 hover:text-brand-500 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950'
+            }`}
+            role="menuitem"
+          >
+            Journal
           </a>
           <a
             href="#reflect"

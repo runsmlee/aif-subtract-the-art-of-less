@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -114,6 +114,24 @@ export function BeforeAfter() {
     });
     setTimeout(() => setAnimatingId(null), 500);
   }, []);
+
+  // Keyboard shortcut: left/right arrows to navigate comparison cards
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        const unrevealed = comparisons.filter((c) => !revealedIds.has(c.id));
+        if (unrevealed.length > 0) {
+          const target = e.key === 'ArrowRight' ? unrevealed[0] : unrevealed[unrevealed.length - 1];
+          handleReveal(target.id);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [revealedIds, handleReveal]);
 
   const handleRevealAll = useCallback(() => {
     setRevealedIds(new Set(comparisons.map((c) => c.id)));

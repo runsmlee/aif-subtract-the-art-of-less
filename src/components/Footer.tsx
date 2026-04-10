@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const footerTaglines = [
   'Less is more.',
   'Simplicity is the ultimate sophistication.',
@@ -8,7 +10,9 @@ const footerTaglines = [
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const tagline = footerTaglines[Math.floor(Math.random() * footerTaglines.length)];
+  const [tagline] = useState(() =>
+    footerTaglines[Math.floor(Math.random() * footerTaglines.length)]
+  );
 
   return (
     <footer className="py-12 border-t border-gray-100 dark:border-gray-800" role="contentinfo">
@@ -47,6 +51,14 @@ export function Footer() {
                   className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
                 >
                   Practice
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#journal"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
+                >
+                  Journal
                 </a>
               </li>
               <li>

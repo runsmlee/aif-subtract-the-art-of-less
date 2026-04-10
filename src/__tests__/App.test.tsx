@@ -69,6 +69,20 @@ describe('App', () => {
     expect(reflectHeading).toBeInTheDocument();
   });
 
+  it('renders the subtraction journal section', () => {
+    renderWithTheme(<App />);
+    const journalHeading = screen.getByRole('heading', {
+      name: /Your subtraction log/i,
+    });
+    expect(journalHeading).toBeInTheDocument();
+  });
+
+  it('renders the keyboard shortcuts help button', () => {
+    renderWithTheme(<App />);
+    const shortcutsButton = screen.getByLabelText('Show keyboard shortcuts');
+    expect(shortcutsButton).toBeInTheDocument();
+  });
+
   it('renders navigation links', () => {
     renderWithTheme(<App />);
     const nav = screen.getByRole('navigation', { name: 'Main navigation' });
