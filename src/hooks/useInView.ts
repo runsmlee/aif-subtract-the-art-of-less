@@ -6,12 +6,14 @@ interface UseInViewOptions {
   once?: boolean;
 }
 
-export function useInView(options: UseInViewOptions = {}): {
-  ref: React.RefObject<HTMLDivElement | null>;
+export function useInView<T extends HTMLElement = HTMLDivElement>(
+  options: UseInViewOptions = {},
+): {
+  ref: React.RefObject<T | null>;
   isInView: boolean;
 } {
   const { threshold = 0.1, rootMargin = '0px', once = true } = options;
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<T | null>(null);
   const [isInView, setIsInView] = useState(false);
 
   const handleIntersection = useCallback(

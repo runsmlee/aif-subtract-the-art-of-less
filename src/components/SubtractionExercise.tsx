@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -120,7 +120,7 @@ function RemovedToast({ label }: { label: string }) {
 export function SubtractionExercise() {
   const [items, setItems] = useState<ClutterItem[]>(initialItems);
   const [customInput, setCustomInput] = useState('');
-  const [customIdCounter, setCustomIdCounter] = useState(0);
+  const customIdCounter = useRef(0);
   const [toast, setToast] = useState<string | null>(null);
   const { ref, isInView } = useInView({ threshold: 0.1 });
   const prefersReducedMotion = useReducedMotion();
@@ -165,16 +165,16 @@ export function SubtractionExercise() {
     const trimmed = customInput.trim();
     if (trimmed.length === 0) return;
 
-    setCustomIdCounter((prev) => prev + 1);
+    customIdCounter.current += 1;
     const newItem: ClutterItem = {
-      id: `custom-${customIdCounter}`,
+      id: `custom-${customIdCounter.current}`,
       label: trimmed,
       removed: false,
       isCustom: true,
     };
     setItems((prev) => [...prev, newItem]);
     setCustomInput('');
-  }, [customInput, customIdCounter]);
+  }, [customInput]);
 
   const handleCustomKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -200,17 +200,25 @@ export function SubtractionExercise() {
 
   const handleShare = useCallback(async () => {
     const text = getShareText();
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'My Subtraction Score', text });
-      } catch {
-        // User cancelled or share failed — copy to clipboard as fallback
-        await navigator.clipboard.writeText(text);
+    try {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'My Subtraction Score', text });
+          return;
+        } catch (err) {
+          if (err instanceof Error && err.name === 'AbortError') {
+            return;
+          }
+          // Share failed (not cancelled) — fall through to clipboard
+        }
       }
-    } else {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+        showToast('Score copied to clipboard');
+      }
+    } catch {
+      showToast('Could not share — try copying manually');
     }
-    showToast('Score copied to clipboard');
   }, [getShareText, showToast]);
 
   // Keyboard shortcut: number keys to remove items

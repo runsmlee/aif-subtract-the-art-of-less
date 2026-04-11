@@ -120,6 +120,7 @@ function getCategoryLabel(category: Challenge['category']): string {
 export function DailyChallenge() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const { ref, isInView } = useInView({ threshold: 0.15 });
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = !prefersReducedMotion && isInView;
@@ -133,6 +134,17 @@ export function DailyChallenge() {
       setIsCompleted(true);
     }
   }, [challenge.id]);
+
+  useEffect(() => {
+    const ids = new Set<string>();
+    for (const c of challenges) {
+      const stored = localStorage.getItem(`subtract-challenge-${c.id}`);
+      if (stored === 'completed') {
+        ids.add(c.id);
+      }
+    }
+    setCompletedIds(ids);
+  }, [isCompleted]);
 
   const handleComplete = useCallback(() => {
     setIsCompleted(true);
@@ -288,10 +300,7 @@ export function DailyChallenge() {
                 {challenges.slice(0, 7).map((c, i) => {
                   const dayOffset = i;
                   const isToday = dayOffset === 0;
-                  const storedStatus = typeof window !== 'undefined'
-                    ? localStorage.getItem(`subtract-challenge-${c.id}`)
-                    : null;
-                  const done = storedStatus === 'completed';
+                  const done = completedIds.has(c.id);
 
                   return (
                     <div
