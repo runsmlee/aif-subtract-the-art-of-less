@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useTheme } from '../context/ThemeContext';
@@ -61,14 +61,22 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const activeSection = useActiveSection();
   const prefersReducedMotion = useReducedMotion();
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 20);
+        rafRef.current = 0;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   const closeMobileMenu = useCallback(() => {

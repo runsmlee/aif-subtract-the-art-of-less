@@ -43,6 +43,7 @@ export function Quote() {
     }, 6000);
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInView, isPaused, currentIndex]);
 
   const goToQuote = useCallback((index: number) => {

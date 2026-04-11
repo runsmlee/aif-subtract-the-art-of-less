@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface ShortcutItem {
@@ -17,10 +17,64 @@ const shortcuts: ShortcutItem[] = [
 export function KeyboardShortcuts() {
   const [isOpen, setIsOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const togglePanel = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
+
+  // Focus management: save/restore focus when dialog opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      // Focus the close button after animation
+      const timer = setTimeout(() => {
+        const closeButton = panelRef.current?.querySelector<HTMLButtonElement>(
+          'button[aria-label="Close shortcuts panel"]',
+        );
+        closeButton?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    if (previousFocusRef.current) {
+      previousFocusRef.current.focus();
+      previousFocusRef.current = null;
+    }
+    return undefined;
+  }, [isOpen]);
+
+  // Focus trap for the dialog
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleTabTrap = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab' || !panelRef.current) return;
+
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
+        'button, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleTabTrap);
+    return () => document.removeEventListener('keydown', handleTabTrap);
+  }, [isOpen]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -35,12 +89,14 @@ export function KeyboardShortcuts() {
       if (e.key === '?') {
         e.preventDefault();
         togglePanel();
+      } else if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [togglePanel]);
+  }, [togglePanel, isOpen]);
 
   if (!isOpen) {
     return (
@@ -75,6 +131,7 @@ export function KeyboardShortcuts() {
 
       {/* Panel */}
       <div
+        ref={panelRef}
         className={`relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 ${
           prefersReducedMotion ? '' : 'animate-scale-in'
         }`}

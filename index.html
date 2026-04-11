@@ -19,6 +19,17 @@
     <meta name="twitter:description" content="The most powerful improvements come not from adding more, but from removing what stands in the way." />
 
     <title>Subtract — The Art of Less</title>
+    <script>
+      // Prevent dark mode flash by setting class before React hydrates
+      (function() {
+        try {
+          var theme = localStorage.getItem('subtract-theme');
+          if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body class="antialiased">
     <div id="root"></div>

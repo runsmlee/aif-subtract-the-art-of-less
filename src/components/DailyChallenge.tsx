@@ -296,7 +296,7 @@ export function DailyChallenge() {
 
             {/* Progress indicator */}
             <div className="mt-6 flex items-center justify-center gap-3">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5" role="group" aria-label="Challenge progress">
                 {challenges.slice(0, 7).map((c, i) => {
                   const dayOffset = i;
                   const isToday = dayOffset === 0;
@@ -313,7 +313,7 @@ export function DailyChallenge() {
                             : 'bg-gray-200 dark:bg-gray-700'
                       }`}
                       title={c.title}
-                      aria-hidden="true"
+                      aria-label={`${c.title}${done ? ' (completed)' : ''}${isToday ? ' (today)' : ''}`}
                     />
                   );
                 })}

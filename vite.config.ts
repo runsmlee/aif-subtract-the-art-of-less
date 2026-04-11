@@ -14,6 +14,16 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
             return 'vendor';
           }
+          // Split large component groups into separate chunks
+          if (id.includes('src/components/SubtractionExercise') || id.includes('src/components/SubtractionJournal')) {
+            return 'features-interactive';
+          }
+          if (id.includes('src/components/DailyChallenge') || id.includes('src/components/BeforeAfter')) {
+            return 'features-content';
+          }
+          if (id.includes('src/components/Quote') || id.includes('src/components/Reflection') || id.includes('src/components/Principles')) {
+            return 'features-reflection';
+          }
         },
       },
     },

@@ -19,10 +19,24 @@
     <meta name="twitter:description" content="The most powerful improvements come not from adding more, but from removing what stands in the way." />
 
     <title>Subtract — The Art of Less</title>
-    <script type="module" crossorigin src="/assets/index-D2SOwNyh.js"></script>
+    <script>
+      // Prevent dark mode flash by setting class before React hydrates
+      (function() {
+        try {
+          var theme = localStorage.getItem('subtract-theme');
+          if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-CwVe8wJn.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-Cr0BHlHC.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-JJQFPHdA.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-CES9sN2P.css">
+    <link rel="modulepreload" crossorigin href="/assets/features-content-ieXyi64P.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-BwtxsNEA.js">
+    <link rel="modulepreload" crossorigin href="/assets/features-reflection-MoxgiUID.js">
+    <link rel="modulepreload" crossorigin href="/assets/features-interactive-DFYKxmGF.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CtvvnYJx.css">
   </head>
   <body class="antialiased">
     <div id="root"></div>
