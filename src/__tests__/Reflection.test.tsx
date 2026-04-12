@@ -1,8 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Reflection } from '../components/Reflection';
 
 describe('Reflection', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('renders the section heading', () => {
     render(<Reflection />);
     const heading = screen.getByRole('heading', {
@@ -51,10 +55,11 @@ describe('Reflection', () => {
     expect(submitButton).not.toBeDisabled();
   });
 
-  it('shows confirmation after submitting reflection', () => {
+  it('shows saved content after submitting reflection', () => {
     render(<Reflection />);
 
     const prompts = screen.getAllByRole('radio');
+    const promptText = prompts[0].textContent ?? '';
     fireEvent.click(prompts[0]);
 
     const textarea = screen.getByPlaceholderText('Write your thoughts here...');
@@ -63,7 +68,13 @@ describe('Reflection', () => {
     const submitButton = screen.getByText('Save Reflection');
     fireEvent.click(submitButton);
 
-    expect(screen.getByText('Reflection saved.')).toBeInTheDocument();
+    // Should show the saved content — prompt text appears in history panel and/or saved state card
+    const promptMatches = screen.getAllByText(promptText);
+    expect(promptMatches.length).toBeGreaterThanOrEqual(1);
+    // Reflection text also appears in multiple places
+    const reflectionMatches = screen.getAllByText('My reflection');
+    expect(reflectionMatches.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/Reflection saved/)).toBeInTheDocument();
   });
 
   it('allows writing another reflection after submission', () => {

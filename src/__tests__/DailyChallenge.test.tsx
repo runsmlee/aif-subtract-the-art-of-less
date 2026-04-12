@@ -2,6 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DailyChallenge } from '../components/DailyChallenge';
 
+const STORAGE_KEY = 'subtract-challenges';
+
+function getTodayDateStr(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 describe('DailyChallenge', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -50,7 +56,7 @@ describe('DailyChallenge', () => {
     }
   });
 
-  it('persists completion state in localStorage', () => {
+  it('persists completion state in localStorage using date-based key', () => {
     render(<DailyChallenge />);
     const buttons = screen.getAllByRole('button');
     const completeButton = buttons.find(
@@ -59,34 +65,51 @@ describe('DailyChallenge', () => {
 
     if (completeButton) {
       fireEvent.click(completeButton);
-      // Check that localStorage was called by verifying the completed text appears
-      // which means the useEffect detected the stored value
-      expect(screen.getByText(/Challenge completed today/)).toBeInTheDocument();
+
+      const stored = localStorage.getItem(STORAGE_KEY);
+      expect(stored).not.toBeNull();
+      const parsed = JSON.parse(stored!);
+      expect(parsed.date).toBe(getTodayDateStr());
+      expect(Array.isArray(parsed.completedIds)).toBe(true);
     }
   });
 
-  it('shows completed state when localStorage has completion', () => {
-    // Pre-set a completed challenge
-    // We need to figure out which challenge is today's
+  it('shows completed state when localStorage has today\'s completion', () => {
+    const todayStr = getTodayDateStr();
+    // Get today's challenge index
     const dayOfYear = Math.floor(
       (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000,
     );
-    const challengeIndex = dayOfYear % 10; // challenges.length = 10
+    const challengeIndex = dayOfYear % 10;
 
     const challenges = [
       'unsubscribe', 'one-thing', 'closet', 'notification', 'no-meeting',
       'single-task', 'gratitude', 'app-delete', 'five-minute', 'surface',
     ];
     const challengeId = challenges[challengeIndex];
-    localStorage.setItem(`subtract-challenge-${challengeId}`, 'completed');
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ date: todayStr, completedIds: [challengeId] }),
+    );
 
     render(<DailyChallenge />);
     expect(screen.getByText(/Challenge completed today/)).toBeInTheDocument();
   });
 
+  it('does NOT show completed state when localStorage has yesterday\'s data', () => {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ date: yesterday, completedIds: ['some-id'] }),
+    );
+
+    render(<DailyChallenge />);
+    expect(screen.queryByText(/Challenge completed today/)).not.toBeInTheDocument();
+  });
+
   it('renders progress indicator dots', () => {
     render(<DailyChallenge />);
-    // The progress dots are rendered (they don't have accessible names but exist)
     const section = screen.getByRole('heading', { name: /One small subtraction/ })
       .closest('section');
     expect(section).toBeInTheDocument();

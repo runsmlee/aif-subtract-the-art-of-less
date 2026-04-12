@@ -83,6 +83,40 @@ const challenges: Challenge[] = [
   },
 ];
 
+const STORAGE_KEY = 'subtract-challenges';
+
+function getTodayDateStr(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+interface ChallengeStorage {
+  date: string;
+  completedIds: string[];
+}
+
+function loadChallengeStorage(): ChallengeStorage {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { date: '', completedIds: [] };
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      typeof parsed !== 'object' ||
+      parsed === null ||
+      !('date' in parsed) ||
+      !('completedIds' in parsed)
+    ) {
+      return { date: '', completedIds: [] };
+    }
+    return parsed as ChallengeStorage;
+  } catch {
+    return { date: '', completedIds: [] };
+  }
+}
+
+function saveChallengeStorage(data: ChallengeStorage): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
 function getDailyChallengeIndex(): number {
   const today = new Date();
   const dayOfYear = Math.floor(
@@ -127,31 +161,41 @@ export function DailyChallenge() {
 
   const challengeIndex = getDailyChallengeIndex();
   const challenge = challenges[challengeIndex];
+  const todayDateStr = getTodayDateStr();
 
+  // On mount: load persisted state, but only if it's from today
   useEffect(() => {
-    const stored = localStorage.getItem(`subtract-challenge-${challenge.id}`);
-    if (stored === 'completed') {
+    const stored = loadChallengeStorage();
+    if (stored.date === todayDateStr && stored.completedIds.includes(challenge.id)) {
       setIsCompleted(true);
-    }
-  }, [challenge.id]);
-
-  useEffect(() => {
-    const ids = new Set<string>();
-    for (const c of challenges) {
-      const stored = localStorage.getItem(`subtract-challenge-${c.id}`);
-      if (stored === 'completed') {
-        ids.add(c.id);
+      setCompletedIds(new Set(stored.completedIds));
+    } else {
+      // Different day or no data: clean up old storage, start fresh
+      if (stored.date !== todayDateStr && stored.date !== '') {
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
-    setCompletedIds(ids);
-  }, [isCompleted]);
+  }, [challenge.id, todayDateStr]);
 
   const handleComplete = useCallback(() => {
     setIsCompleted(true);
     setShowConfetti(true);
-    localStorage.setItem(`subtract-challenge-${challenge.id}`, 'completed');
+
+    // Load existing, update with new completion
+    const stored = loadChallengeStorage();
+    const updatedIds = stored.date === todayDateStr
+      ? stored.completedIds
+      : [];
+
+    if (!updatedIds.includes(challenge.id)) {
+      updatedIds.push(challenge.id);
+    }
+
+    saveChallengeStorage({ date: todayDateStr, completedIds: updatedIds });
+    setCompletedIds(new Set(updatedIds));
+
     setTimeout(() => setShowConfetti(false), 2000);
-  }, [challenge.id]);
+  }, [challenge.id, todayDateStr]);
 
   return (
     <section
@@ -297,9 +341,8 @@ export function DailyChallenge() {
             {/* Progress indicator */}
             <div className="mt-6 flex items-center justify-center gap-3">
               <div className="flex items-center gap-1.5" role="group" aria-label="Challenge progress">
-                {challenges.slice(0, 7).map((c, i) => {
-                  const dayOffset = i;
-                  const isToday = dayOffset === 0;
+                {challenges.slice(0, 7).map((c) => {
+                  const isToday = c.id === challenge.id;
                   const done = completedIds.has(c.id);
 
                   return (
