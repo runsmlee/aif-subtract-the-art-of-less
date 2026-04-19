@@ -78,6 +78,7 @@ export function SubtractionJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>(() => loadEntries());
   const [newEntry, setNewEntry] = useState('');
   const [filter, setFilter] = useState<'all' | 'today' | 'week'>('all');
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { ref, isInView } = useInView({ threshold: 0.1 });
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = !prefersReducedMotion && isInView;
@@ -133,6 +134,7 @@ export function SubtractionJournal() {
 
   const handleClear = useCallback(() => {
     setEntries([]);
+    setShowClearConfirm(false);
   }, []);
 
   return (
@@ -334,14 +336,37 @@ export function SubtractionJournal() {
           )}
 
           {/* Clear all */}
-          {totalCount > 0 && (
+          {totalCount > 0 && !showClearConfirm && (
             <div className="mt-6 text-center">
               <button
-                onClick={handleClear}
+                onClick={() => setShowClearConfirm(true)}
                 className="text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded underline underline-offset-4"
               >
                 Clear all entries
               </button>
+            </div>
+          )}
+
+          {/* Clear confirmation */}
+          {showClearConfirm && (
+            <div className="mt-6 p-4 rounded-xl border border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/30">
+              <p className="text-sm text-red-700 dark:text-red-400 mb-3">
+                Are you sure you want to clear all journal entries? This cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleClear}
+                  className="text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+                >
+                  Yes, clear all
+                </button>
+                <button
+                  onClick={() => setShowClearConfirm(false)}
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
         </div>

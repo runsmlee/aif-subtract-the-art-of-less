@@ -68,6 +68,13 @@ function getRandomPrompts(count: number, exclude?: number[]): number[] {
   const available = Array.from({ length: allReflectionPrompts.length }, (_, i) => i)
     .filter((i) => !exclude?.includes(i));
 
+  // If we've excluded too many prompts, reset and pick from all
+  if (available.length < count) {
+    const allIndices = Array.from({ length: allReflectionPrompts.length }, (_, i) => i);
+    const shuffled = allIndices.sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+  }
+
   const shuffled = available.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
@@ -144,7 +151,7 @@ export function Reflection() {
     }
   }, [reflection, selectedPromptIndex, currentPromptIndices, currentPrompts]);
 
-  const handleNewPrompts = useCallback(() => {
+  const refreshPrompts = useCallback(() => {
     const newIndices = getRandomPrompts(3, usedPromptIndices);
     setCurrentPromptIndices(newIndices);
     setSelectedPromptIndex(null);
@@ -154,15 +161,8 @@ export function Reflection() {
     setLastSavedText('');
   }, [usedPromptIndices]);
 
-  const handleWriteAnother = useCallback(() => {
-    const newIndices = getRandomPrompts(3, usedPromptIndices);
-    setCurrentPromptIndices(newIndices);
-    setSelectedPromptIndex(null);
-    setReflection('');
-    setIsSubmitted(false);
-    setLastSavedPrompt('');
-    setLastSavedText('');
-  }, [usedPromptIndices]);
+  const handleNewPrompts = refreshPrompts;
+  const handleWriteAnother = refreshPrompts;
 
   const handleClearHistory = useCallback(() => {
     setSavedReflections([]);

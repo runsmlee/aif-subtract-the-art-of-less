@@ -103,7 +103,7 @@ describe('SubtractionJournal', () => {
     expect(screen.getByText('Persisted entry')).toBeInTheDocument();
   });
 
-  it('clears all entries when clicking clear button', () => {
+  it('clears all entries when clicking clear button with confirmation', () => {
     render(<SubtractionJournal />);
     const input = screen.getByLabelText('What did you subtract today?');
 
@@ -113,9 +113,36 @@ describe('SubtractionJournal', () => {
     const clearButton = screen.getByText('Clear all entries');
     fireEvent.click(clearButton);
 
+    // Confirmation dialog should appear
+    expect(screen.getByText(/Are you sure you want to clear all journal entries/)).toBeInTheDocument();
+
+    // Confirm the clear
+    const confirmButton = screen.getByText('Yes, clear all');
+    fireEvent.click(confirmButton);
+
     expect(screen.queryByText('Entry one')).not.toBeInTheDocument();
     expect(
       screen.getByText(/Your journal is empty/),
     ).toBeInTheDocument();
+  });
+
+  it('can dismiss clear confirmation', () => {
+    render(<SubtractionJournal />);
+    const input = screen.getByLabelText('What did you subtract today?');
+
+    fireEvent.change(input, { target: { value: 'Entry one' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    const clearButton = screen.getByText('Clear all entries');
+    fireEvent.click(clearButton);
+
+    // Cancel the clear
+    const cancelButton = screen.getByText('Cancel');
+    fireEvent.click(cancelButton);
+
+    // Entry should still exist
+    expect(screen.getByText('Entry one')).toBeInTheDocument();
+    // Confirmation should be gone
+    expect(screen.queryByText(/Are you sure you want to clear all journal entries/)).not.toBeInTheDocument();
   });
 });

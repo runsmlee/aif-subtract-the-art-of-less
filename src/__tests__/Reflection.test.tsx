@@ -122,4 +122,30 @@ describe('Reflection', () => {
     const newPrompts = screen.getAllByRole('radio');
     expect(newPrompts).toHaveLength(3);
   });
+
+  it('continues showing prompts after all prompts have been used', () => {
+    render(<Reflection />);
+
+    // Use all 10 prompts (4 rounds of ~3 prompts + extras)
+    for (let round = 0; round < 4; round++) {
+      const prompts = screen.getAllByRole('radio');
+      if (prompts.length === 0) break;
+      fireEvent.click(prompts[0]);
+
+      const textarea = screen.getByPlaceholderText('Write your thoughts here...');
+      fireEvent.change(textarea, { target: { value: `Reflection ${round}` } });
+
+      const submitButton = screen.getByText('Save Reflection');
+      fireEvent.click(submitButton);
+
+      const writeAnother = screen.queryByText('Write another reflection');
+      if (writeAnother) {
+        fireEvent.click(writeAnother);
+      }
+    }
+
+    // After using many prompts, new prompts should still be available
+    const finalPrompts = screen.getAllByRole('radio');
+    expect(finalPrompts).toHaveLength(3);
+  });
 });
