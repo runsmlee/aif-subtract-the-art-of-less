@@ -138,4 +138,18 @@ describe('App', () => {
     const main = screen.getByRole('main');
     expect(main).toBeInTheDocument();
   });
+
+  it('renders the progress tracker section', () => {
+    renderWithTheme(<App />);
+    const progressHeading = screen.getByRole('heading', {
+      name: /Your journey/i,
+    });
+    expect(progressHeading).toBeInTheDocument();
+  });
+
+  it('renders the progress overview region', () => {
+    renderWithTheme(<App />);
+    const region = screen.getByRole('region', { name: /Progress overview/i });
+    expect(region).toBeInTheDocument();
+  });
 });

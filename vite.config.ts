@@ -15,7 +15,7 @@ export default defineConfig({
             return 'vendor';
           }
           // Split large component groups into separate chunks
-          if (id.includes('src/components/SubtractionExercise') || id.includes('src/components/SubtractionJournal')) {
+          if (id.includes('src/components/SubtractionExercise') || id.includes('src/components/SubtractionJournal') || id.includes('src/components/ProgressTracker')) {
             return 'features-interactive';
           }
           if (id.includes('src/components/DailyChallenge') || id.includes('src/components/BeforeAfter')) {

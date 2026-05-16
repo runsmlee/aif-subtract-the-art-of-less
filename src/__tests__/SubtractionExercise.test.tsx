@@ -1,8 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { SubtractionExercise } from '../components/SubtractionExercise';
 
 describe('SubtractionExercise', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
   it('renders the exercise heading', () => {
     render(<SubtractionExercise />);
     const heading = screen.getByRole('heading', {

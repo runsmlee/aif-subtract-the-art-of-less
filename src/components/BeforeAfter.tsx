@@ -11,12 +11,38 @@ interface ComparisonItem {
   afterCount: number;
 }
 
+const BEFOREAFTER_STORAGE_KEY = 'subtract-beforeafter';
+
 const comparisons: ComparisonItem[] = [
   { id: 'design', before: '10 decorative elements', after: '1 clear message', icon: '✦', beforeCount: 10, afterCount: 1 },
   { id: 'schedule', before: '12 meetings this week', after: '3 meaningful conversations', icon: '◎', beforeCount: 12, afterCount: 3 },
   { id: 'goals', before: '25 priorities for Q4', after: '3 outcomes that matter', icon: '◆', beforeCount: 25, afterCount: 3 },
   { id: 'inbox', before: '200 unread emails', after: '5 requiring action', icon: '○', beforeCount: 200, afterCount: 5 },
 ];
+
+const VALID_IDS = new Set(comparisons.map((c) => c.id));
+
+function loadRevealedIds(): string[] {
+  try {
+    const raw = localStorage.getItem(BEFOREAFTER_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (id: unknown): id is string => typeof id === 'string' && VALID_IDS.has(id),
+    );
+  } catch {
+    return [];
+  }
+}
+
+function saveRevealedIds(ids: Set<string>): void {
+  if (ids.size === 0) {
+    localStorage.removeItem(BEFOREAFTER_STORAGE_KEY);
+  } else {
+    localStorage.setItem(BEFOREAFTER_STORAGE_KEY, JSON.stringify([...ids]));
+  }
+}
 
 function ComparisonCard({
   item,
@@ -96,7 +122,10 @@ function ComparisonCard({
 }
 
 export function BeforeAfter() {
-  const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+  const [revealedIds, setRevealedIds] = useState<Set<string>>(() => {
+    const stored = loadRevealedIds();
+    return new Set(stored);
+  });
   const [animatingId, setAnimatingId] = useState<string | null>(null);
   const { ref, isInView } = useInView({ threshold: 0.1 });
   const prefersReducedMotion = useReducedMotion();
@@ -136,6 +165,11 @@ export function BeforeAfter() {
   const handleRevealAll = useCallback(() => {
     setRevealedIds(new Set(comparisons.map((c) => c.id)));
   }, []);
+
+  // Persist revealed state to localStorage
+  useEffect(() => {
+    saveRevealedIds(revealedIds);
+  }, [revealedIds]);
 
   return (
     <section

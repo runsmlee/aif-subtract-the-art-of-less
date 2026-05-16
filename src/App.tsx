@@ -12,6 +12,7 @@ import { ScrollProgress } from './components/ScrollProgress';
 import { ScrollToTop } from './components/ScrollToTop';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { KeyboardShortcuts } from './components/KeyboardShortcuts';
+import { ProgressTracker } from './components/ProgressTracker';
 import { useTheme } from './context/ThemeContext';
 import { useEffect, useCallback } from 'react';
 
@@ -56,6 +57,10 @@ export function App() {
         <ErrorBoundary>
           <Hero />
         </ErrorBoundary>
+        <ErrorBoundary>
+          <ProgressTracker />
+        </ErrorBoundary>
+        <div className="section-divider" aria-hidden="true" />
         <ErrorBoundary>
           <Principles />
         </ErrorBoundary>

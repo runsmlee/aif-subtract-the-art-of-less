@@ -1,8 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { BeforeAfter } from '../components/BeforeAfter';
 
 describe('BeforeAfter', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
   it('renders the section heading', () => {
     render(<BeforeAfter />);
     const heading = screen.getByRole('heading', {

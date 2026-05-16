@@ -9,6 +9,8 @@ interface ClutterItem {
   isCustom?: boolean;
 }
 
+const EXERCISE_STORAGE_KEY = 'subtract-exercise';
+
 const initialItems: ClutterItem[] = [
   { id: 'meetings', label: 'Unnecessary meetings', removed: false },
   { id: 'notifications', label: 'Endless notifications', removed: false },
@@ -19,6 +21,34 @@ const initialItems: ClutterItem[] = [
   { id: 'comparisons', label: 'Social comparisons', removed: false },
   { id: 'assumptions', label: 'Unchecked assumptions', removed: false },
 ];
+
+function loadRemovedIds(): string[] {
+  try {
+    const raw = localStorage.getItem(EXERCISE_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((id: unknown): id is string => typeof id === 'string');
+  } catch {
+    return [];
+  }
+}
+
+function saveRemovedIds(ids: string[]): void {
+  if (ids.length === 0) {
+    localStorage.removeItem(EXERCISE_STORAGE_KEY);
+  } else {
+    localStorage.setItem(EXERCISE_STORAGE_KEY, JSON.stringify(ids));
+  }
+}
+
+function getInitialItems(removedIds: string[]): ClutterItem[] {
+  const idSet = new Set(removedIds);
+  return initialItems.map((item) => ({
+    ...item,
+    removed: idSet.has(item.id),
+  }));
+}
 
 function CompletionCelebration({ onReset, onReflect, onShare }: { onReset: () => void; onReflect: () => void; onShare: () => void }) {
   const { ref, isInView } = useInView({ threshold: 0.2 });
@@ -118,7 +148,10 @@ function RemovedToast({ label }: { label: string }) {
 }
 
 export function SubtractionExercise() {
-  const [items, setItems] = useState<ClutterItem[]>(initialItems);
+  const [items, setItems] = useState<ClutterItem[]>(() => {
+    const removedIds = loadRemovedIds();
+    return getInitialItems(removedIds);
+  });
   const [customInput, setCustomInput] = useState('');
   const customIdCounter = useRef(0);
   const [toast, setToast] = useState<string | null>(null);
@@ -129,6 +162,14 @@ export function SubtractionExercise() {
   const removedCount = items.filter((item) => item.removed).length;
   const remainingCount = items.filter((item) => !item.removed).length;
   const totalCount = items.length;
+
+  // Persist removed state to localStorage whenever items change
+  useEffect(() => {
+    const removedIds = items
+      .filter((item) => item.removed)
+      .map((item) => item.id);
+    saveRemovedIds(removedIds);
+  }, [items]);
 
   const showToast = useCallback((label: string) => {
     setToast(label);
@@ -155,6 +196,7 @@ export function SubtractionExercise() {
   const handleReset = useCallback(() => {
     setItems(initialItems.map((item) => ({ ...item, removed: false })));
     setCustomInput('');
+    saveRemovedIds([]);
   }, []);
 
   const handleDeleteCustom = useCallback((id: string) => {
