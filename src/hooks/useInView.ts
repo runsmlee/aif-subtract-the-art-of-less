@@ -9,11 +9,11 @@ interface UseInViewOptions {
 export function useInView<T extends HTMLElement = HTMLDivElement>(
   options: UseInViewOptions = {},
 ): {
-  ref: React.RefObject<T | null>;
+  ref: React.RefObject<T>;
   isInView: boolean;
 } {
   const { threshold = 0.1, rootMargin = '0px', once = true } = options;
-  const ref = useRef<T | null>(null);
+  const ref = useRef<T>(null);
   const [isInView, setIsInView] = useState(false);
 
   const handleIntersection = useCallback(
