@@ -7,6 +7,7 @@ import { SubtractionExercise } from './components/SubtractionExercise';
 import { SubtractionJournal } from './components/SubtractionJournal';
 import { Quote } from './components/Quote';
 import { Reflection } from './components/Reflection';
+import { MindfulBreak } from './components/MindfulBreak';
 import { Footer } from './components/Footer';
 import { ScrollProgress } from './components/ScrollProgress';
 import { ScrollToTop } from './components/ScrollToTop';
@@ -59,6 +60,10 @@ export function App() {
         </ErrorBoundary>
         <ErrorBoundary>
           <ProgressTracker />
+        </ErrorBoundary>
+        <div className="section-divider" aria-hidden="true" />
+        <ErrorBoundary>
+          <MindfulBreak />
         </ErrorBoundary>
         <div className="section-divider" aria-hidden="true" />
         <ErrorBoundary>

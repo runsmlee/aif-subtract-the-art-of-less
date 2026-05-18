@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Quote } from '../components/Quote';
 
 describe('Quote', () => {
@@ -29,7 +29,9 @@ describe('Quote', () => {
     fireEvent.click(nextButton);
 
     // Wait for transition
-    vi.advanceTimersByTime(300);
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
 
     // Should show a different quote
     const blockquote = document.querySelector('blockquote');
@@ -42,7 +44,9 @@ describe('Quote', () => {
     fireEvent.click(prevButton);
 
     // Wait for transition
-    vi.advanceTimersByTime(300);
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
 
     const blockquote = document.querySelector('blockquote');
     expect(blockquote).toBeInTheDocument();
@@ -61,7 +65,9 @@ describe('Quote', () => {
     fireEvent.click(tabs[2]);
 
     // Wait for transition
-    vi.advanceTimersByTime(300);
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
 
     const blockquote = document.querySelector('blockquote');
     expect(blockquote).toBeInTheDocument();
@@ -77,7 +83,50 @@ describe('Quote', () => {
     render(<Quote />);
 
     // Advance past the auto-advance timer (6 seconds)
-    vi.advanceTimersByTime(6200);
+    await act(async () => {
+      vi.advanceTimersByTime(6200);
+    });
+
+    const blockquote = document.querySelector('blockquote');
+    expect(blockquote).toBeInTheDocument();
+  });
+
+  it('wraps around when advancing past the last quote', async () => {
+    render(<Quote />);
+
+    // Advance through all 5 quotes to wrap around back to first
+    for (let i = 0; i < 5; i++) {
+      await act(async () => {
+        vi.advanceTimersByTime(6200);
+      });
+    }
+
+    const blockquote = document.querySelector('blockquote');
+    expect(blockquote).toBeInTheDocument();
+  });
+
+  it('shows pause indicator when hovered', async () => {
+    render(<Quote />);
+    const carousel = screen.getByRole('region', { name: 'Quote carousel' });
+
+    fireEvent.mouseEnter(carousel);
+    expect(screen.getByText(/Paused/)).toBeInTheDocument();
+
+    fireEvent.mouseLeave(carousel);
+    expect(screen.queryByText(/Paused/)).not.toBeInTheDocument();
+  });
+
+  it('supports swipe gestures for mobile navigation', async () => {
+    render(<Quote />);
+    const carousel = screen.getByRole('region', { name: 'Quote carousel' });
+
+    // Swipe left (next quote)
+    fireEvent.touchStart(carousel, { touches: [{ clientX: 200 }] });
+    fireEvent.touchEnd(carousel, { changedTouches: [{ clientX: 100 }] });
+
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
 
     const blockquote = document.querySelector('blockquote');
     expect(blockquote).toBeInTheDocument();

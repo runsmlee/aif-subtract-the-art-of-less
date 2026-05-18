@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const SECTION_IDS = ['principles', 'practice', 'journal', 'reflect'];
+const SECTION_IDS = ['principles', 'practice', 'journal', 'reflect']; // mindful-break intentionally omitted from nav to keep it simple
 
 export function useActiveSection(): string {
   const [activeSection, setActiveSection] = useState('');

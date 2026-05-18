@@ -49,6 +49,7 @@ export function ProgressTracker() {
   const beforeAfterRevealed = readCountFromStorage('subtract-beforeafter');
   const journalEntries = readCountFromStorage('subtract-journal');
   const reflectionsCount = readCountFromStorage('subtract-reflections');
+  const mindfulSessions = readCountFromStorage('subtract-mindful-sessions');
   const challengeCompleted = isChallengeCompletedToday();
 
   const stats: ProgressStat[] = [
@@ -82,6 +83,13 @@ export function ProgressTracker() {
       icon: '◉',
       storageKey: 'subtract-reflections',
     },
+    {
+      label: 'Mindful breaks',
+      value: mindfulSessions,
+      max: 0,
+      icon: '○',
+      storageKey: 'subtract-mindful-sessions',
+    },
   ];
 
   const totalActive = stats.filter((s) => s.value > 0).length;
@@ -111,7 +119,7 @@ export function ProgressTracker() {
           </div>
 
           {/* Progress grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
             {stats.map((stat) => (
               <div
                 key={stat.storageKey}
@@ -169,9 +177,9 @@ export function ProgressTracker() {
           {/* Summary */}
           {totalActive > 0 && (
             <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-              {totalActive === 4
+              {totalActive === stats.length
                 ? 'You\'re engaging with every section. Keep subtracting.'
-                : `${totalActive} of 4 areas started. Every subtraction counts.`}
+                : `${totalActive} of ${stats.length} areas started. Every subtraction counts.`}
             </p>
           )}
         </div>

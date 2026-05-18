@@ -332,21 +332,23 @@ export function Hero() {
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
           }`}
+          role="group"
+          aria-label="Key statistics"
         >
           <div className="text-center">
-            <p className="text-2xl sm:text-3xl font-bold text-brand-500">
+            <p className="text-2xl sm:text-3xl font-bold text-brand-500" aria-label="8 things to let go">
               <AnimatedCounter target={8} shouldStart={shouldAnimate} />
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">things to let go</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl sm:text-3xl font-bold text-brand-500">
+            <p className="text-2xl sm:text-3xl font-bold text-brand-500" aria-label="4 core principles">
               <AnimatedCounter target={4} shouldStart={shouldAnimate} />
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">core principles</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl sm:text-3xl font-bold text-brand-500">
+            <p className="text-2xl sm:text-3xl font-bold text-brand-500" aria-label="Infinite potential unlocked">
               ∞
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">potential unlocked</p>

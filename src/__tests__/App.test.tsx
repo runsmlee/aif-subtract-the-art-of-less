@@ -127,8 +127,8 @@ describe('App', () => {
   it('renders the section divider', () => {
     renderWithTheme(<App />);
     const main = screen.getByRole('main');
-    const divider = main.querySelector('.section-divider');
-    expect(divider).toBeInTheDocument();
+    const dividers = main.querySelectorAll('.section-divider');
+    expect(dividers.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders without crashing with ScrollToTop', () => {
@@ -151,5 +151,13 @@ describe('App', () => {
     renderWithTheme(<App />);
     const region = screen.getByRole('region', { name: /Progress overview/i });
     expect(region).toBeInTheDocument();
+  });
+
+  it('renders the mindful break section', () => {
+    renderWithTheme(<App />);
+    const mindfulHeading = screen.getByRole('heading', {
+      name: /A mindful minute/i,
+    });
+    expect(mindfulHeading).toBeInTheDocument();
   });
 });

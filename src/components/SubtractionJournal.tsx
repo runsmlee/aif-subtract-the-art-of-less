@@ -137,6 +137,32 @@ export function SubtractionJournal() {
     setShowClearConfirm(false);
   }, []);
 
+  const handleExport = useCallback(() => {
+    if (entries.length === 0) return;
+
+    const lines = entries
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .map((entry) => `- [${entry.date}] ${entry.text}`);
+
+    const content = [
+      '# Subtract — My Subtraction Log',
+      `# Exported on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+      `# ${entries.length} entries total`,
+      '',
+      ...lines,
+    ].join('\n');
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `subtract-journal-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [entries]);
+
   return (
     <section
       id="journal"
@@ -335,9 +361,16 @@ export function SubtractionJournal() {
             </div>
           )}
 
-          {/* Clear all */}
+          {/* Clear all / Export */}
           {totalCount > 0 && !showClearConfirm && (
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-center flex items-center justify-center gap-4">
+              <button
+                onClick={handleExport}
+                className="text-sm text-gray-400 dark:text-gray-500 hover:text-brand-500 dark:hover:text-brand-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded underline underline-offset-4"
+              >
+                Export journal
+              </button>
+              <span className="text-gray-200 dark:text-gray-700" aria-hidden="true">|</span>
               <button
                 onClick={() => setShowClearConfirm(true)}
                 className="text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded underline underline-offset-4"

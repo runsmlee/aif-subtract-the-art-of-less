@@ -15,12 +15,13 @@ describe('ProgressTracker', () => {
     expect(heading).toBeInTheDocument();
   });
 
-  it('renders all four progress categories', () => {
+  it('renders all progress categories', () => {
     render(<ProgressTracker />);
     expect(screen.getByText(/Items subtracted/)).toBeInTheDocument();
     expect(screen.getByText(/Before & After/)).toBeInTheDocument();
     expect(screen.getByText(/Journal entries/)).toBeInTheDocument();
     expect(screen.getByText(/Reflections/)).toBeInTheDocument();
+    expect(screen.getByText(/Mindful breaks/)).toBeInTheDocument();
   });
 
   it('shows zero state when no data exists', () => {

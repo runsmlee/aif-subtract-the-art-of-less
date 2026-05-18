@@ -18,7 +18,7 @@ export default defineConfig({
           if (id.includes('src/components/SubtractionExercise') || id.includes('src/components/SubtractionJournal') || id.includes('src/components/ProgressTracker')) {
             return 'features-interactive';
           }
-          if (id.includes('src/components/DailyChallenge') || id.includes('src/components/BeforeAfter')) {
+          if (id.includes('src/components/DailyChallenge') || id.includes('src/components/BeforeAfter') || id.includes('src/components/MindfulBreak')) {
             return 'features-content';
           }
           if (id.includes('src/components/Quote') || id.includes('src/components/Reflection') || id.includes('src/components/Principles')) {
