@@ -198,13 +198,13 @@ export function SubtractionJournal() {
           <div className="grid grid-cols-3 gap-4 mb-8">
             <div className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-center">
               <p className="text-2xl font-bold text-brand-500">{totalCount}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                 Total subtractions
               </p>
             </div>
             <div className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-center">
               <p className="text-2xl font-bold text-brand-500">{todayCount}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                 Today
               </p>
             </div>
@@ -212,7 +212,7 @@ export function SubtractionJournal() {
               <p className="text-2xl font-bold text-brand-500">
                 {streak > 0 ? streak : '—'}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                 Day streak
               </p>
             </div>
@@ -269,7 +269,7 @@ export function SubtractionJournal() {
                   className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1 dark:focus:ring-offset-gray-900 ${
                     filter === f
                       ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300'
                   }`}
                   role="tab"
                   aria-selected={filter === f}
@@ -303,13 +303,13 @@ export function SubtractionJournal() {
                     <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
                       {entry.text}
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {formatDate(entry.date)}
                     </p>
                   </div>
                   <button
                     onClick={() => handleDelete(entry.id)}
-                    className="flex-shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 dark:focus:ring-offset-gray-900"
+                    className="flex-shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 w-8 h-8 flex items-center justify-center rounded-lg text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 hover:bg-red-50 dark:hover:bg-red-950 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 dark:focus:ring-offset-gray-900"
                     aria-label={`Delete entry: ${entry.text}`}
                   >
                     <svg
@@ -346,14 +346,14 @@ export function SubtractionJournal() {
                   stroke="currentColor"
                   strokeWidth="1.5"
                   strokeLinecap="round"
-                  className="text-gray-400 dark:text-gray-500"
+                  className="text-gray-500 dark:text-gray-400"
                 >
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                   <polyline points="14 2 14 8 20 8" />
                   <line x1="9" y1="15" x2="15" y2="15" />
                 </svg>
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 {entries.length === 0
                   ? 'Your journal is empty. Start by logging something you let go of today.'
                   : 'No entries match this filter.'}
@@ -366,14 +366,14 @@ export function SubtractionJournal() {
             <div className="mt-6 text-center flex items-center justify-center gap-4">
               <button
                 onClick={handleExport}
-                className="text-sm text-gray-400 dark:text-gray-500 hover:text-brand-500 dark:hover:text-brand-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded underline underline-offset-4"
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded underline underline-offset-4"
               >
                 Export journal
               </button>
               <span className="text-gray-200 dark:text-gray-700" aria-hidden="true">|</span>
               <button
                 onClick={() => setShowClearConfirm(true)}
-                className="text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded underline underline-offset-4"
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded underline underline-offset-4"
               >
                 Clear all entries
               </button>
@@ -395,7 +395,7 @@ export function SubtractionJournal() {
                 </button>
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+                  className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
                 >
                   Cancel
                 </button>

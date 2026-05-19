@@ -89,17 +89,17 @@ function CompletionCelebration({ onReset, onReflect, onShare }: { onReset: () =>
         <div className="flex justify-center gap-8 mb-8">
           <div className="text-center">
             <p className="text-2xl font-bold text-brand-500">8</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Items removed</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">Items removed</p>
           </div>
           <div className="w-px bg-brand-200 dark:bg-brand-800" />
           <div className="text-center">
             <p className="text-2xl font-bold text-brand-500">100%</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Clarity gained</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">Clarity gained</p>
           </div>
           <div className="w-px bg-brand-200 dark:bg-brand-800" />
           <div className="text-center">
             <p className="text-2xl font-bold text-brand-500">∞</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Potential unlocked</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">Potential unlocked</p>
           </div>
         </div>
 
@@ -125,7 +125,7 @@ function CompletionCelebration({ onReset, onReflect, onShare }: { onReset: () =>
           </button>
           <button
             onClick={onReset}
-            className="inline-flex items-center justify-center h-11 px-6 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+            className="inline-flex items-center justify-center h-11 px-6 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
           >
             Start Over
           </button>
@@ -303,7 +303,7 @@ export function SubtractionExercise() {
             Click to subtract each item. Watch how lighter things feel when you
             let go.
           </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             Tip: Press 1-9 to subtract by keyboard
           </p>
         </div>
@@ -328,7 +328,7 @@ export function SubtractionExercise() {
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {removedCount} of {totalCount} subtracted
               </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">{progressPercent}%</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{progressPercent}%</span>
             </div>
             <div className="relative h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
               <div
@@ -393,7 +393,7 @@ export function SubtractionExercise() {
                   {item.isCustom && !item.removed && (
                     <button
                       onClick={() => handleDeleteCustom(item.id)}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 dark:focus:ring-offset-gray-900"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 hover:bg-red-50 dark:hover:bg-red-950 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 dark:focus:ring-offset-gray-900"
                       aria-label={`Delete ${item.label}`}
                     >
                       <svg
@@ -417,7 +417,7 @@ export function SubtractionExercise() {
                     }
                     className={`inline-flex items-center justify-center w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
                       item.removed
-                        ? 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? 'text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                         : 'text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950'
                     }`}
                     aria-label={
@@ -485,7 +485,7 @@ export function SubtractionExercise() {
             <div className="mt-6 text-center">
               <button
                 onClick={handleReset}
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline underline-offset-4 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded"
+                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 underline underline-offset-4 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded"
               >
                 Reset exercise
               </button>

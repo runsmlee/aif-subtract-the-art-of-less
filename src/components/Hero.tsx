@@ -363,7 +363,7 @@ export function Hero() {
           aria-hidden="true"
         >
           <div className="w-6 h-10 border-2 border-gray-300 dark:border-gray-600 rounded-full mx-auto flex justify-center">
-            <div className="w-1 h-3 bg-gray-400 dark:bg-gray-500 rounded-full mt-2 animate-bounce" />
+            <div className="w-1 h-3 bg-gray-400 dark:bg-gray-500 rounded-full mt-2 animate-pulse" />
           </div>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">Scroll to explore</p>
         </div>

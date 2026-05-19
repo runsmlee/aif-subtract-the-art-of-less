@@ -122,7 +122,7 @@ export function KeyboardShortcuts() {
     >
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-black/50 backdrop-blur-sm ${
+        className={`absolute inset-0 bg-slate-950/55 backdrop-blur-sm ${
           prefersReducedMotion ? '' : 'animate-fade-in'
         }`}
         onClick={togglePanel}
