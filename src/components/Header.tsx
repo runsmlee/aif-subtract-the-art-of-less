@@ -160,7 +160,7 @@ export function Header() {
         aria-label="Main navigation"
       >
         <a
-          href="#"
+          href="/"
           className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100 hover:text-brand-500 dark:hover:text-brand-400 transition-colors duration-200"
           aria-label="Subtract — Home"
         >

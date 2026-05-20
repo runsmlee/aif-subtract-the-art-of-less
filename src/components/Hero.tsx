@@ -286,8 +286,7 @@ export function Hero() {
               : 'opacity-0 translate-y-4'
           }`}
         >
-          The most powerful improvements come not from adding more, but from
-          removing what stands in the way.
+          What would you subtract?
         </p>
 
         <div
