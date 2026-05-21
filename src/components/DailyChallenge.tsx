@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { getLocalDateStr } from '../utils/date';
 
 interface Challenge {
   id: string;
@@ -86,7 +87,7 @@ const challenges: Challenge[] = [
 const STORAGE_KEY = 'subtract-challenges';
 
 function getTodayDateStr(): string {
-  return new Date().toISOString().split('T')[0];
+  return getLocalDateStr();
 }
 
 interface ChallengeStorage {
@@ -255,11 +256,11 @@ export function DailyChallenge() {
                       key={i}
                       className="absolute w-2 h-2 rounded-full bg-brand-500"
                       style={{
-                        left: `${10 + Math.random() * 80}%`,
-                        top: `${20 + Math.random() * 60}%`,
+                        left: `${10 + ((i * 37) % 80)}%`,
+                        top: `${20 + ((i * 53) % 60)}%`,
                         animation: `fadeIn 0.3s ease-out ${i * 50}ms both, scaleIn 0.4s ease-out ${i * 50}ms both`,
-                        opacity: 0.6 + Math.random() * 0.4,
-                        transform: `scale(${0.5 + Math.random()})`,
+                        opacity: 0.6 + (i * 0.03),
+                        transform: `scale(${0.5 + (i * 0.04)})`,
                       }}
                     />
                   ))}

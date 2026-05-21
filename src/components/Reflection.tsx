@@ -64,19 +64,35 @@ function formatReflectionDate(isoString: string): string {
   });
 }
 
-function getRandomPrompts(count: number, exclude?: number[]): number[] {
+function seededShuffle(arr: number[], seed: number): number[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const j = s % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function getPromptIndices(count: number, exclude?: number[]): number[] {
   const available = Array.from({ length: allReflectionPrompts.length }, (_, i) => i)
     .filter((i) => !exclude?.includes(i));
 
   // If we've excluded too many prompts, reset and pick from all
   if (available.length < count) {
     const allIndices = Array.from({ length: allReflectionPrompts.length }, (_, i) => i);
-    const shuffled = allIndices.sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
+    // Use day-of-year as seed for deterministic but varying selection
+    const now = new Date();
+    const dayOfYear = Math.floor(
+      (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000,
+    );
+    return seededShuffle(allIndices, dayOfYear).slice(0, count);
   }
 
-  const shuffled = available.sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+  // Use a counter-based seed so each refresh gives different prompts
+  const seed = Date.now();
+  return seededShuffle(available, seed).slice(0, count);
 }
 
 export function Reflection() {
@@ -85,7 +101,7 @@ export function Reflection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [usedPromptIndices, setUsedPromptIndices] = useState<number[]>([]);
   const [currentPromptIndices, setCurrentPromptIndices] = useState<number[]>(() =>
-    getRandomPrompts(3),
+    getPromptIndices(3),
   );
   const [savedReflections, setSavedReflections] = useState<SavedReflection[]>(() =>
     loadSavedReflections(),
@@ -137,7 +153,7 @@ export function Reflection() {
     if (reflection.trim().length > 0 && selectedPromptIndex !== null) {
       const promptText = currentPrompts[selectedPromptIndex];
       const newEntry: SavedReflection = {
-        id: `r-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: `r-${crypto.randomUUID()}`,
         promptText,
         reflectionText: reflection.trim(),
         savedAt: new Date().toISOString(),
@@ -152,7 +168,7 @@ export function Reflection() {
   }, [reflection, selectedPromptIndex, currentPromptIndices, currentPrompts]);
 
   const refreshPrompts = useCallback(() => {
-    const newIndices = getRandomPrompts(3, usedPromptIndices);
+    const newIndices = getPromptIndices(3, usedPromptIndices);
     setCurrentPromptIndices(newIndices);
     setSelectedPromptIndex(null);
     setReflection('');

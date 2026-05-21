@@ -10,9 +10,14 @@ const footerTaglines = [
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const [tagline] = useState(() =>
-    footerTaglines[Math.floor(Math.random() * footerTaglines.length)]
-  );
+  const [tagline] = useState(() => {
+    // Deterministic tagline based on day of year — consistent within a session
+    const now = new Date();
+    const dayOfYear = Math.floor(
+      (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000,
+    );
+    return footerTaglines[dayOfYear % footerTaglines.length];
+  });
 
   return (
     <footer className="py-12 border-t border-gray-100 dark:border-gray-800" role="contentinfo">

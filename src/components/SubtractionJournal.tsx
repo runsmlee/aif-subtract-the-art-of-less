@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { getLocalDateStr } from '../utils/date';
 
 interface JournalEntry {
   id: string;
@@ -85,7 +86,7 @@ export function SubtractionJournal() {
 
   const streak = useMemo(() => getStreakCount(entries), [entries]);
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getLocalDateStr();
   const todayCount = entries.filter((e) => e.date === todayStr).length;
   const totalCount = entries.length;
 
@@ -108,9 +109,9 @@ export function SubtractionJournal() {
     if (trimmed.length === 0) return;
 
     const entry: JournalEntry = {
-      id: `j-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      id: `j-${crypto.randomUUID()}`,
       text: trimmed,
-      date: new Date().toISOString().split('T')[0],
+      date: getLocalDateStr(),
       createdAt: Date.now(),
     };
 

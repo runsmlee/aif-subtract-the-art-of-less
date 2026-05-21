@@ -1,16 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DailyChallenge } from '../components/DailyChallenge';
+import { getLocalDateStr } from '../utils/date';
 
 const STORAGE_KEY = 'subtract-challenges';
 
-function getTodayDateStr(): string {
-  return new Date().toISOString().split('T')[0];
-}
-
 function getYesterdayDateStr(): string {
   const d = new Date(Date.now() - 86400000);
-  return d.toISOString().split('T')[0];
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 describe('DailyChallenge persistence with date-based storage', () => {
@@ -33,7 +33,7 @@ describe('DailyChallenge persistence with date-based storage', () => {
       const stored = localStorage.getItem(STORAGE_KEY);
       expect(stored).not.toBeNull();
       const parsed = JSON.parse(stored!);
-      expect(parsed.date).toBe(getTodayDateStr());
+      expect(parsed.date).toBe(getLocalDateStr());
       expect(Array.isArray(parsed.completedIds)).toBe(true);
       expect(parsed.completedIds.length).toBeGreaterThanOrEqual(1);
     }
@@ -41,7 +41,7 @@ describe('DailyChallenge persistence with date-based storage', () => {
 
   it('restores today\'s completed challenges on mount', () => {
     // Pre-set today's completed state
-    const todayDateStr = getTodayDateStr();
+    const todayDateStr = getLocalDateStr();
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({ date: todayDateStr, completedIds: ['test-challenge'] }),

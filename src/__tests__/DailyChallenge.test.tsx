@@ -1,12 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DailyChallenge } from '../components/DailyChallenge';
+import { getLocalDateStr } from '../utils/date';
 
 const STORAGE_KEY = 'subtract-challenges';
-
-function getTodayDateStr(): string {
-  return new Date().toISOString().split('T')[0];
-}
 
 describe('DailyChallenge', () => {
   beforeEach(() => {
@@ -69,13 +66,13 @@ describe('DailyChallenge', () => {
       const stored = localStorage.getItem(STORAGE_KEY);
       expect(stored).not.toBeNull();
       const parsed = JSON.parse(stored!);
-      expect(parsed.date).toBe(getTodayDateStr());
+      expect(parsed.date).toBe(getLocalDateStr());
       expect(Array.isArray(parsed.completedIds)).toBe(true);
     }
   });
 
   it('shows completed state when localStorage has today\'s completion', () => {
-    const todayStr = getTodayDateStr();
+    const todayStr = getLocalDateStr();
     // Get today's challenge index
     const dayOfYear = Math.floor(
       (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000,
@@ -98,7 +95,13 @@ describe('DailyChallenge', () => {
   });
 
   it('does NOT show completed state when localStorage has yesterday\'s data', () => {
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const yesterday = (() => {
+      const d = new Date(Date.now() - 86400000);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    })();
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({ date: yesterday, completedIds: ['some-id'] }),

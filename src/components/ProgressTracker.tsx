@@ -1,5 +1,6 @@
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { getLocalDateStr } from '../utils/date';
 
 interface ProgressStat {
   label: string;
@@ -33,7 +34,7 @@ function isChallengeCompletedToday(): boolean {
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== 'object' || parsed === null) return false;
     const obj = parsed as Record<string, unknown>;
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateStr();
     return obj.date === today && Array.isArray(obj.completedIds) && obj.completedIds.length > 0;
   } catch {
     return false;

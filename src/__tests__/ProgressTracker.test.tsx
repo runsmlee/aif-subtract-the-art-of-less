@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ProgressTracker } from '../components/ProgressTracker';
+import { getLocalDateStr } from '../utils/date';
 
 describe('ProgressTracker', () => {
   beforeEach(() => {
@@ -96,7 +97,7 @@ describe('ProgressTracker', () => {
   });
 
   it('shows challenge completion status', () => {
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getLocalDateStr();
     localStorage.setItem(
       'subtract-challenges',
       JSON.stringify({ date: todayStr, completedIds: ['test-id'] }),

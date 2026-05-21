@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { getLocalDateStr } from '../utils/date';
 
 type Phase = 'idle' | 'inhale' | 'hold' | 'exhale' | 'complete';
 
@@ -55,7 +56,7 @@ function saveSessions(sessions: SessionRecord[]): void {
 }
 
 function getTodayCount(sessions: SessionRecord[]): number {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
   return sessions.filter((s) => s.date === today).length;
 }
 
@@ -136,7 +137,7 @@ export function MindfulBreak() {
           setPhase('complete');
           setCycle(nextCycle);
           const session: SessionRecord = {
-            date: new Date().toISOString().split('T')[0],
+            date: getLocalDateStr(),
             cycles: TOTAL_CYCLES,
             completedAt: Date.now(),
           };
