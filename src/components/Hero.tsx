@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useInView } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -50,6 +50,10 @@ const floatingShapes: FloatingShape[] = [
   { id: 7, cx: 75, cy: 40, r: 7, type: 'triangle', rotation: 30 },
   { id: 8, cx: 130, cy: 70, r: 6, type: 'circle', rotation: 0 },
 ];
+
+const HERO_INPUT_KEY = 'subtract-hero-input';
+
+export { HERO_INPUT_KEY };
 
 function SubtractionVisual({ shouldAnimate }: { shouldAnimate: boolean }) {
   const [step, setStep] = useState(0);
@@ -215,6 +219,40 @@ export function Hero() {
   const { ref, isInView } = useInView({ threshold: 0.15 });
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = !prefersReducedMotion && isInView;
+  const [inputValue, setInputValue] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = inputValue.trim();
+    if (trimmed.length === 0) return;
+
+    // Store the item for the SubtractionExercise to pick up
+    const stored: string[] = JSON.parse(localStorage.getItem(HERO_INPUT_KEY) || '[]');
+    stored.push(trimmed);
+    localStorage.setItem(HERO_INPUT_KEY, JSON.stringify(stored));
+
+    setSubmitted(true);
+    setInputValue('');
+
+    // Track the interaction
+    if (typeof window !== 'undefined' && window.aif?.track) {
+      window.aif.track('hero_subtract', { item: trimmed });
+    }
+
+    // Scroll to the exercise section
+    setTimeout(() => {
+      document.getElementById('practice')?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  }, [inputValue]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  }, [handleSubmit]);
 
   return (
     <section
@@ -279,15 +317,76 @@ export function Hero() {
           <span className="text-brand-500">that doesn&apos;t matter.</span>
         </h1>
 
-        <p
-          className={`max-w-xl mx-auto text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed mb-10 transition-all duration-700 delay-200 ${
+        {/* Interactive subtraction input — primary user action */}
+        <div
+          className={`max-w-md mx-auto mb-4 transition-all duration-700 delay-200 ${
             shouldAnimate
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
           }`}
         >
-          What would you subtract?
-        </p>
+          {!submitted ? (
+            <form onSubmit={handleSubmit} className="relative" role="search">
+              <label htmlFor="hero-subtract-input" className="sr-only">
+                What would you subtract?
+              </label>
+              <input
+                ref={inputRef}
+                id="hero-subtract-input"
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="What would you subtract?"
+                className="w-full h-14 px-5 pr-14 text-base border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                maxLength={100}
+                aria-describedby="hero-subtract-hint"
+              />
+              <button
+                type="submit"
+                disabled={inputValue.trim().length === 0}
+                className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-10 h-10 rounded-lg text-white bg-brand-500 hover:bg-brand-600 dark:hover:bg-brand-400 active:bg-brand-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+                aria-label="Subtract this item"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+              <p id="hero-subtract-hint" className="sr-only">
+                Type something weighing you down, then press Enter to subtract it
+              </p>
+            </form>
+          ) : (
+            <div
+              className="h-14 flex items-center justify-center gap-2 text-brand-600 dark:text-brand-400 font-medium animate-fade-in"
+              role="status"
+              aria-live="polite"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Subtracted. Keep going below.
+            </div>
+          )}
+        </div>
 
         <div
           className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-700 delay-300 ${

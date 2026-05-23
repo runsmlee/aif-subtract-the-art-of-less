@@ -10,6 +10,7 @@ interface ClutterItem {
 }
 
 const EXERCISE_STORAGE_KEY = 'subtract-exercise';
+export const HERO_INPUT_KEY = 'subtract-hero-input';
 
 const initialItems: ClutterItem[] = [
   { id: 'meetings', label: 'Unnecessary meetings', removed: false },
@@ -170,6 +171,41 @@ export function SubtractionExercise() {
       .map((item) => item.id);
     saveRemovedIds(removedIds);
   }, [items]);
+
+  // Consume hero-submitted items and add them to the exercise
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(HERO_INPUT_KEY);
+      if (!raw) return;
+      const heroItems: unknown = JSON.parse(raw);
+      if (!Array.isArray(heroItems) || heroItems.length === 0) return;
+
+      const labels: string[] = heroItems.filter(
+        (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0,
+      );
+      if (labels.length === 0) return;
+
+      localStorage.removeItem(HERO_INPUT_KEY);
+
+      setItems((prev) => {
+        const existingLabels = new Set(prev.map((i) => i.label.toLowerCase()));
+        const newItems: ClutterItem[] = labels
+          .filter((l) => !existingLabels.has(l.trim().toLowerCase()))
+          .map((label) => {
+            customIdCounter.current += 1;
+            return {
+              id: `hero-${customIdCounter.current}`,
+              label: label.trim(),
+              removed: false,
+              isCustom: true,
+            };
+          });
+        return [...prev, ...newItems];
+      });
+    } catch {
+      // Ignore parse errors
+    }
+  }, []);
 
   const showToast = useCallback((label: string) => {
     setToast(label);
