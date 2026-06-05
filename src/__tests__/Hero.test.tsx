@@ -16,7 +16,7 @@ describe('Hero', () => {
     renderHero();
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toBeInTheDocument();
-    expect(heading.textContent).toContain('Subtract everything');
+    expect(heading.textContent).toContain('Cognitive Load Index');
   });
 
   it('renders the interactive subtraction input', () => {
@@ -91,6 +91,12 @@ describe('Hero', () => {
   it('renders the "The Art of Less" subtitle', () => {
     renderHero();
     expect(screen.getByText('The Art of Less')).toBeInTheDocument();
+  });
+
+  it('renders the descriptive subheadline', () => {
+    renderHero();
+    expect(screen.getByText(/Paste any page's HTML/)).toBeInTheDocument();
+    expect(screen.getByText(/\/100 cognitive load score/)).toBeInTheDocument();
   });
 
   it('renders key statistics', () => {

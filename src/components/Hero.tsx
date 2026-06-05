@@ -306,16 +306,26 @@ export function Hero() {
         </p>
 
         <h1
-          className={`text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-gray-100 leading-[1.1] mb-6 transition-all duration-700 delay-100 ${
+          className={`text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-gray-100 leading-[1.1] mb-4 transition-all duration-700 delay-100 ${
             shouldAnimate
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
           }`}
         >
-          Subtract everything
+          Cognitive Load Index
           <br />
-          <span className="text-brand-500">that doesn&apos;t matter.</span>
+          <span className="text-brand-500">Measure What to Subtract.</span>
         </h1>
+
+        <p
+          className={`text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-lg mx-auto mb-8 transition-all duration-700 delay-150 ${
+            shouldAnimate
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
+          Paste any page&apos;s HTML. Get a /100 cognitive load score and a short list of elements to cut.
+        </p>
 
         {/* Interactive subtraction input — primary user action */}
         <div
