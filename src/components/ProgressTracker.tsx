@@ -100,7 +100,6 @@ export function ProgressTracker() {
       ref={ref}
       className="py-16 sm:py-20"
       aria-label="Progress overview"
-      role="region"
     >
       <div className="section-container">
         <div

@@ -19,89 +19,71 @@ describe('Hero', () => {
     expect(heading.textContent).toContain('Cognitive Load Index');
   });
 
-  it('renders the interactive subtraction input', () => {
+  it('renders the URL input', () => {
     renderHero();
-    const input = screen.getByPlaceholderText('What would you subtract?');
+    const input = screen.getByPlaceholderText('Paste any URL to analyze...');
     expect(input).toBeInTheDocument();
   });
 
   it('renders the input with accessible label', () => {
     renderHero();
-    const input = screen.getByLabelText('What would you subtract?');
+    const input = screen.getByLabelText('Paste a URL to analyze cognitive load');
     expect(input).toBeInTheDocument();
   });
 
   it('disables submit button when input is empty', () => {
     renderHero();
-    const submitButton = screen.getByLabelText('Subtract this item');
+    const submitButton = screen.getByLabelText('Analyze this URL');
     expect(submitButton).toBeDisabled();
   });
 
   it('enables submit button when input has text', () => {
     renderHero();
-    const input = screen.getByPlaceholderText('What would you subtract?');
-    fireEvent.change(input, { target: { value: 'Unnecessary meetings' } });
-    const submitButton = screen.getByLabelText('Subtract this item');
+    const input = screen.getByPlaceholderText('Paste any URL to analyze...');
+    fireEvent.change(input, { target: { value: 'https://example.com' } });
+    const submitButton = screen.getByLabelText('Analyze this URL');
     expect(submitButton).not.toBeDisabled();
   });
 
-  it('stores submitted item in localStorage and shows confirmation', () => {
+  it('stores submitted URL in localStorage and shows confirmation', () => {
     renderHero();
-    const input = screen.getByPlaceholderText('What would you subtract?');
-    fireEvent.change(input, { target: { value: 'My bad habit' } });
+    const input = screen.getByPlaceholderText('Paste any URL to analyze...');
+    fireEvent.change(input, { target: { value: 'https://example.com' } });
     fireEvent.submit(input.closest('form')!);
 
     // Should show confirmation
-    expect(screen.getByText('Subtracted. Keep going below.')).toBeInTheDocument();
+    expect(screen.getByText(/URL added/)).toBeInTheDocument();
 
     // Should store in localStorage
     const stored = JSON.parse(localStorage.getItem(HERO_INPUT_KEY) || '[]');
-    expect(stored).toContain('My bad habit');
+    expect(stored).toContain('https://example.com');
   });
 
   it('replaces input with confirmation after submission', () => {
     renderHero();
-    const input = screen.getByPlaceholderText('What would you subtract?');
-    fireEvent.change(input, { target: { value: 'Test item' } });
+    const input = screen.getByPlaceholderText('Paste any URL to analyze...');
+    fireEvent.change(input, { target: { value: 'https://example.com' } });
     fireEvent.submit(input.closest('form')!);
 
     // Input should be replaced by confirmation message
-    expect(screen.queryByPlaceholderText('What would you subtract?')).not.toBeInTheDocument();
-    expect(screen.getByText('Subtracted. Keep going below.')).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Paste any URL to analyze...')).not.toBeInTheDocument();
+    expect(screen.getByText(/URL added/)).toBeInTheDocument();
   });
 
   it('does not submit empty input', () => {
     renderHero();
-    const input = screen.getByPlaceholderText('What would you subtract?');
+    const input = screen.getByPlaceholderText('Paste any URL to analyze...');
     fireEvent.change(input, { target: { value: '   ' } });
     fireEvent.submit(input.closest('form')!);
 
     // Should NOT show confirmation
-    expect(screen.queryByText('Subtracted. Keep going below.')).not.toBeInTheDocument();
+    expect(screen.queryByText(/URL added/)).not.toBeInTheDocument();
     // Should NOT store in localStorage
     expect(localStorage.getItem(HERO_INPUT_KEY)).toBeNull();
   });
 
-  it('renders the CTA buttons', () => {
+  it('renders the micro-copy tagline', () => {
     renderHero();
-    expect(screen.getByText('Try the Exercise')).toBeInTheDocument();
-    expect(screen.getByText('Learn Why')).toBeInTheDocument();
-  });
-
-  it('renders the "The Art of Less" subtitle', () => {
-    renderHero();
-    expect(screen.getByText('The Art of Less')).toBeInTheDocument();
-  });
-
-  it('renders the descriptive subheadline', () => {
-    renderHero();
-    expect(screen.getByText(/Paste any page's HTML/)).toBeInTheDocument();
-    expect(screen.getByText(/\/100 cognitive load score/)).toBeInTheDocument();
-  });
-
-  it('renders key statistics', () => {
-    renderHero();
-    const statsGroup = screen.getByRole('group', { name: 'Key statistics' });
-    expect(statsGroup).toBeInTheDocument();
+    expect(screen.getByText(/Paste a URL.*cognitive load.*subtract/)).toBeInTheDocument();
   });
 });

@@ -10,7 +10,7 @@ interface ClutterItem {
 }
 
 const EXERCISE_STORAGE_KEY = 'subtract-exercise';
-export const HERO_INPUT_KEY = 'subtract-hero-input';
+const HERO_INPUT_KEY = 'subtract-hero-input';
 
 const initialItems: ClutterItem[] = [
   { id: 'meetings', label: 'Unnecessary meetings', removed: false },
