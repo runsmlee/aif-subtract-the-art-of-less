@@ -16,7 +16,7 @@ describe('Hero', () => {
     renderHero();
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toBeInTheDocument();
-    expect(heading.textContent).toContain('Cognitive Load Index');
+    expect(heading.textContent).toContain('Website Clutter Score');
   });
 
   it('renders the URL input', () => {
@@ -27,7 +27,7 @@ describe('Hero', () => {
 
   it('renders the input with accessible label', () => {
     renderHero();
-    const input = screen.getByLabelText('Paste a URL to analyze cognitive load');
+    const input = screen.getByLabelText('Paste a URL to check its clutter score');
     expect(input).toBeInTheDocument();
   });
 
@@ -84,6 +84,15 @@ describe('Hero', () => {
 
   it('renders the micro-copy tagline', () => {
     renderHero();
-    expect(screen.getByText(/Paste a URL.*cognitive load.*subtract/)).toBeInTheDocument();
+    expect(screen.getByText(/clutter score.*what to delete/i)).toBeInTheDocument();
+  });
+
+  it('renders the before/after micro-demo with score delta', () => {
+    renderHero();
+    expect(screen.getByText('Before')).toBeInTheDocument();
+    expect(screen.getByText('After')).toBeInTheDocument();
+    expect(screen.getByText('73')).toBeInTheDocument();
+    expect(screen.getByText('31')).toBeInTheDocument();
+    expect(screen.getByText(/−42 pts/)).toBeInTheDocument();
   });
 });

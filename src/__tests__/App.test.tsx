@@ -12,7 +12,7 @@ describe('App', () => {
     renderWithTheme(<App />);
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toBeInTheDocument();
-    expect(heading.textContent).toContain('Cognitive Load Index');
+    expect(heading.textContent).toContain('Website Clutter Score');
   });
 
   it('renders the brand name in the header', () => {

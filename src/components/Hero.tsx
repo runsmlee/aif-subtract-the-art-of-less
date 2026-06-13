@@ -76,9 +76,9 @@ export function Hero() {
               : 'opacity-0 translate-y-4'
           }`}
         >
-          Cognitive Load Index
+          Website Clutter Score
           <br />
-          <span className="text-brand-500">See What to Subtract.</span>
+          <span className="text-brand-500">Find What to Remove.</span>
         </h1>
 
         <p
@@ -88,7 +88,7 @@ export function Hero() {
               : 'opacity-0 translate-y-4'
           }`}
         >
-          Paste a URL. See its cognitive load. Know what to subtract.
+          Paste any URL. Get a clutter score out of 100. See exactly what to delete.
         </p>
 
         {/* Interactive URL input — primary user action */}
@@ -102,7 +102,7 @@ export function Hero() {
           {!submitted ? (
             <form onSubmit={handleSubmit} className="relative" aria-label="Analyze a URL">
               <label htmlFor="hero-url-input" className="sr-only">
-                Paste a URL to analyze cognitive load
+                Paste a URL to check its clutter score
               </label>
               <input
                 ref={inputRef}
@@ -136,7 +136,7 @@ export function Hero() {
                 </svg>
               </button>
               <p id="hero-url-hint" className="sr-only">
-                Enter a webpage URL to measure its cognitive load
+                Enter a webpage URL to check its clutter score
               </p>
             </form>
           ) : (
@@ -160,6 +160,86 @@ export function Hero() {
               URL added. Scroll down to start subtracting.
             </div>
           )}
+        </div>
+
+        {/* Visceral before/after micro-demo */}
+        <div
+          className={`mt-8 flex items-center justify-center gap-3 sm:gap-5 transition-all duration-700 delay-300 ${
+            shouldAnimate
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
+          <p className="sr-only">
+            Before and after example: a cluttered page scoring 73 becomes a clean
+            page scoring 31 — a 42-point reduction.
+          </p>
+
+          {/* Before — cluttered mock */}
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="text-[11px] font-medium tracking-wide uppercase text-gray-400 dark:text-gray-500">
+              Before
+            </span>
+            <div
+              className="w-24 sm:w-28 h-16 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-2 flex flex-col gap-1.5"
+              aria-hidden="true"
+            >
+              <div className="flex gap-1">
+                <div className="h-1.5 w-6 rounded bg-brand-400" />
+                <div className="h-1.5 w-4 rounded bg-gray-400 dark:bg-gray-500" />
+                <div className="h-1.5 w-3 rounded bg-brand-300" />
+                <div className="h-1.5 w-2 rounded bg-gray-300 dark:bg-gray-600" />
+              </div>
+              <div className="flex gap-1">
+                <div className="h-1 flex-1 rounded bg-gray-300 dark:bg-gray-600" />
+                <div className="h-1 w-4 rounded bg-gray-400 dark:bg-gray-500" />
+              </div>
+              <div className="flex gap-1">
+                <div className="h-1.5 w-4 rounded bg-brand-400" />
+                <div className="h-1.5 w-2 rounded bg-gray-300 dark:bg-gray-600" />
+                <div className="h-1.5 w-3 rounded bg-brand-300" />
+                <div className="h-1.5 w-1.5 rounded bg-gray-400 dark:bg-gray-500" />
+                <div className="h-1.5 w-2 rounded bg-gray-300 dark:bg-gray-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Score delta badge */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-50 dark:bg-brand-950 border border-brand-200 dark:border-brand-800">
+              <span className="text-sm font-bold text-gray-400 dark:text-gray-500 line-through">
+                73
+              </span>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#EF4444"
+                strokeWidth="2.5"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+              <span className="text-sm font-bold text-brand-500">31</span>
+            </div>
+            <span className="text-[11px] text-brand-500 font-semibold">
+              −42 pts
+            </span>
+          </div>
+
+          {/* After — clean mock */}
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="text-[11px] font-medium tracking-wide uppercase text-brand-500">
+              After
+            </span>
+            <div
+              className="w-24 sm:w-28 h-16 rounded-lg border border-brand-200 dark:border-brand-800 bg-brand-50/40 dark:bg-brand-950/20 p-2 flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <div className="h-2.5 w-12 rounded bg-brand-500" />
+            </div>
+          </div>
         </div>
       </div>
     </section>
